@@ -1,0 +1,10 @@
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: Latest
+IndentWidth: 4
+BreakTemplateDeclarations: Yes
+IncludeBlocks: Regroup
+PointerAlignment: Left
+Cpp11BracedListStyle: Block
+SpaceBeforeCpp11BracedList: Yes
+ColumnLimit: 120

@@ -1,0 +1,15 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "default",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_CXX_EXTENSIONS": "OFF",
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "GRIDMAZES_WARNINGS_ARE_ERRORS": "ON"
+      }
+    }
+  ]
+}
