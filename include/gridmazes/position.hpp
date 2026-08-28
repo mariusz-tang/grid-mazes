@@ -19,9 +19,9 @@ struct Position {
 
     /** Return the next `Position` in `direction`. */
     [[nodiscard]] Position get_neighbour(Direction direction) const;
-};
 
-[[nodiscard]] bool operator==(const Position& lhs, const Position& rhs) noexcept;
+    [[nodiscard]] bool operator==(const Position& other) const noexcept = default;
+};
 
 } // namespace GridMazes
 

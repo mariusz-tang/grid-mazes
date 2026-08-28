@@ -34,8 +34,4 @@ Position Position::get_neighbour(Direction direction) const {
     throw std::runtime_error { "invalid direction" };
 }
 
-bool operator==(const Position& lhs, const Position& rhs) noexcept {
-    return lhs.column == rhs.column && lhs.row == rhs.row;
-}
-
 } // namespace GridMazes
