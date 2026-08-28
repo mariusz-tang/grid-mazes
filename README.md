@@ -20,7 +20,7 @@ In case an error prevents the build, you can try disabling treating warnings as
 errors:
 
 ```bash
-cmake -B build -DGRIDMAZES_WARNINGS_ARE_ERRORS=OFF
+cmake --compile-no-warning-as-error build
 cmake --build build
 ```
 

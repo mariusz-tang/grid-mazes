@@ -22,25 +22,16 @@ target_sources(
 target_link_libraries(GridMazes PUBLIC Boost::headers)
 target_compile_features(GridMazes PRIVATE cxx_std_23)
 
-# Compiler warnings.
-option(GRIDMAZES_WARNINGS_ARE_ERRORS "treat warnings as errors" ON)
-
 if(
     (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 )
     target_compile_options(GridMazes PRIVATE -Wall -Wpedantic)
-    if(GRIDMAZES_WARNINGS_ARE_ERRORS)
-        target_compile_options(GridMazes PRIVATE -Werror)
-    endif()
 elseif(
     (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     OR (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
 )
     target_compile_options(GridMazes PRIVATE /Wall)
-    if(GRIDMAZES_WARNINGS_ARE_ERRORS)
-        target_compile_options(GridMazes PRIVATE /WX)
-    endif()
 endif()
 
 # Tests.
