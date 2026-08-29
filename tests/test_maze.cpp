@@ -60,7 +60,7 @@ TEST_CASE("maze internal cells", "[maze]") {
 
     SECTION("walls have the same value from both sides") {
         if (maze.is_internal_wall(position, direction)) {
-            maze.set_wall(position, direction, true);
+            maze.place_wall(position, direction);
 
             const auto opposite_position { position.get_neighbour(direction) };
             const auto opposite_direction { GridMazes::get_opposite(direction) };
@@ -68,7 +68,7 @@ TEST_CASE("maze internal cells", "[maze]") {
             REQUIRE(maze.has_wall(position, direction));
             REQUIRE(maze.has_wall(opposite_position, opposite_direction));
 
-            maze.set_wall(position, direction, false);
+            maze.remove_wall(position, direction);
             REQUIRE_FALSE(maze.has_wall(position, direction));
             REQUIRE_FALSE(maze.has_wall(opposite_position, opposite_direction));
         }
@@ -89,7 +89,7 @@ TEST_CASE("maze internal cells", "[maze]") {
         // If both walls are internal.
         if (maze.is_internal_wall(position, direction) && maze.is_internal_wall(wall_position, wall_direction)) {
             // Set the TEST wall.
-            maze.set_wall(wall_position, wall_direction, true);
+            maze.place_wall(wall_position, wall_direction);
             REQUIRE(maze.has_wall(wall_position, wall_direction));
 
             // If the current wall is different from the TEST wall...

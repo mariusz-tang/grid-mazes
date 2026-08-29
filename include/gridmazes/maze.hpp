@@ -45,23 +45,17 @@ class Maze {
      * */
     [[nodiscard]] bool has_wall(Position position, Direction direction) const;
 
-    /** Set the wall in `direction` from `position` to true.
+    /** Place the wall in `direction` from `position`, if it is absent.
      *
      * The maze must contain `position` and the wall must be internal.
      * */
     void place_wall(Position position, Direction direction) { set_wall(position, direction, true); }
 
-    /** Set the wall in `direction` from `position` to false.
+    /** Remove the wall in `direction` from `position`, if it is present.
      *
      * The maze must contain `position` and the wall must be internal.
      * */
     void remove_wall(Position position, Direction direction) { set_wall(position, direction, false); }
-
-    /** Set the wall in `direction` from `position`.
-     *
-     * The maze must contain `position` and the wall must be internal.
-     * */
-    void set_wall(Position position, Direction direction, bool state);
 
   private:
     int m_width;
@@ -69,5 +63,7 @@ class Maze {
     boost::dynamic_bitset<> m_internal_walls;
 
     [[nodiscard]] int get_wall_index(Position position, Direction direction) const;
+
+    void set_wall(Position position, Direction direction, bool state);
 };
 } // namespace GridMazes
