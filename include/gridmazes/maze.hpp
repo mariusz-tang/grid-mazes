@@ -2,6 +2,7 @@
 #include "gridmazes/position.hpp"
 
 #include <boost/dynamic_bitset/dynamic_bitset.hpp>
+#include <generator>
 
 namespace GridMazes {
 /** Represents a 2D grid maze. */
@@ -56,6 +57,12 @@ class Maze {
      * The maze must contain `position` and the wall must be internal.
      * */
     void remove_wall(Position position, Direction direction) { set_wall(position, direction, false); }
+
+    /** Return the positions contained within the maze.
+     *
+     * The behaviour if the maze changes size is undefined.
+     * */
+    [[nodiscard]] std::generator<Position> positions() const noexcept;
 
   private:
     int m_width;

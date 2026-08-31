@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cstddef>
 #include <format>
+#include <generator>
 #include <stdexcept>
 
 namespace GridMazes {
@@ -102,4 +103,11 @@ int Maze::get_wall_index(Position position, Direction direction) const {
     return offset + (2 * position_index) + 1;
 }
 
+std::generator<Position> Maze::positions() const noexcept {
+    for (int column { 0 }; column < m_width; column++) {
+        for (int row { 0 }; row < m_height; row++) {
+            co_yield { .column = column, .row = row };
+        }
+    }
+}
 } // namespace GridMazes
