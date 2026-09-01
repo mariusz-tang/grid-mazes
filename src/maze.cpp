@@ -14,7 +14,7 @@ using enum Direction;
 
 Maze::Maze(int width, int height)
     : m_width { width }, m_height { height },
-      m_internal_walls { static_cast<std::size_t>((2 * width * height) - width - height) } {
+      m_internalWalls { static_cast<std::size_t>((2 * width * height) - width - height) } {
     if (m_width <= 0 || m_height <= 0) {
         throw std::runtime_error { std::format("width and height must be strictly positive, but "
                                                "received {} and {}",
@@ -38,7 +38,7 @@ bool Maze::has_wall(Position position, Direction direction) const {
     if (is_external_wall(position, direction)) {
         return true;
     }
-    return m_internal_walls[get_wall_index(position, direction)];
+    return m_internalWalls[get_wall_index(position, direction)];
 }
 
 void Maze::set_wall(Position position, Direction direction, bool state) {
@@ -51,7 +51,7 @@ void Maze::set_wall(Position position, Direction direction, bool state) {
     if (is_external_wall(position, direction)) {
         throw std::runtime_error { std::format("tried to set an external wall", m_width, m_height, position) };
     }
-    m_internal_walls[get_wall_index(position, direction)] = state;
+    m_internalWalls[get_wall_index(position, direction)] = state;
 }
 
 bool Maze::is_external_wall(Position position, Direction direction) const {

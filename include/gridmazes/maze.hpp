@@ -73,21 +73,21 @@ class Maze {
     }
 
     /** Remove all internal walls. */
-    void clear() noexcept { m_internal_walls.reset(); }
+    void clear() noexcept { m_internalWalls.reset(); }
 
     /** Return true if the maze has no internal walls. */
-    [[nodiscard]] bool is_empty() const noexcept { return m_internal_walls.none(); }
+    [[nodiscard]] bool is_empty() const noexcept { return m_internalWalls.none(); }
 
     /** Place all internal walls. */
-    void fill() noexcept { m_internal_walls.set(); }
+    void fill() noexcept { m_internalWalls.set(); }
 
     /** Return true if the maze has all internal walls present. */
-    [[nodiscard]] bool is_full() const noexcept { return m_internal_walls.all(); }
+    [[nodiscard]] bool is_full() const noexcept { return m_internalWalls.all(); }
 
   private:
     int m_width;
     int m_height;
-    boost::dynamic_bitset<> m_internal_walls;
+    boost::dynamic_bitset<> m_internalWalls;
 
     [[nodiscard]] int get_wall_index(Position position, Direction direction) const;
 
