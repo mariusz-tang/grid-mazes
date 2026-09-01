@@ -74,6 +74,15 @@ TEST_CASE("maze internal cells", "[maze]") {
         }
     }
 
+    SECTION("toggle_wall") {
+        if (maze.is_internal_wall(position, direction)) {
+            maze.toggle_wall(position, direction);
+            REQUIRE(maze.has_wall(position, direction));
+            maze.toggle_wall(position, direction);
+            REQUIRE_FALSE(maze.has_wall(position, direction));
+        }
+    }
+
     SECTION("walls do not affect other walls") {
         const auto wall_column { GENERATE_COPY(range(0, width)) };
         const auto wall_row { GENERATE_COPY(range(0, height)) };
@@ -119,5 +128,56 @@ TEST_CASE("maze external cells", "[maze]") {
             REQUIRE_THROWS(maze.is_external_wall(position, direction));
             REQUIRE_THROWS(maze.has_wall(position, direction));
         }
+    }
+}
+
+TEST_CASE("maze is_empty", "[maze]") {
+    const auto width { 4 };
+    const auto height { 2 };
+    GridMazes::Maze maze { width, height };
+
+    SECTION("maze is empty on construction") { REQUIRE(maze.is_empty()); }
+    SECTION("adding a wall makes it non-empty and removing it makes it empty again") {
+        maze.place_wall({ .column = 2, .row = 1 }, GridMazes::Direction::right);
+        REQUIRE_FALSE(maze.is_empty());
+        maze.remove_wall({ .column = 2, .row = 1 }, GridMazes::Direction::right);
+        REQUIRE(maze.is_empty());
+    }
+    SECTION("clearing a maze makes it empty") {
+        maze.place_wall({ .column = 2, .row = 1 }, GridMazes::Direction::right);
+        maze.place_wall({ .column = 1, .row = 1 }, GridMazes::Direction::up);
+        maze.place_wall({ .column = 0, .row = 1 }, GridMazes::Direction::right);
+        REQUIRE_FALSE(maze.is_empty());
+        maze.clear();
+        REQUIRE(maze.is_empty());
+    }
+}
+
+TEST_CASE("maze fill", "[maze]") {
+    const auto width { 2 };
+    const auto height { 3 };
+    GridMazes::Maze maze { width, height };
+    maze.fill();
+    REQUIRE(maze.has_wall({ 0, 0 }, GridMazes::Direction::right));
+    REQUIRE(maze.has_wall({ 0, 1 }, GridMazes::Direction::right));
+    REQUIRE(maze.has_wall({ 0, 2 }, GridMazes::Direction::right));
+    REQUIRE(maze.has_wall({ 0, 0 }, GridMazes::Direction::down));
+    REQUIRE(maze.has_wall({ 0, 1 }, GridMazes::Direction::down));
+    REQUIRE(maze.has_wall({ 1, 0 }, GridMazes::Direction::down));
+    REQUIRE(maze.has_wall({ 1, 1 }, GridMazes::Direction::down));
+}
+
+TEST_CASE("maze is_full", "[maze]") {
+    const auto width { 3 };
+    const auto height { 3 };
+    GridMazes::Maze maze { width, height };
+
+    SECTION("maze is not full on construction") { REQUIRE_FALSE(maze.is_full()); }
+
+    SECTION("filling the maze makes it full and then removing a wall makes it not full") {
+        maze.fill();
+        REQUIRE(maze.is_full());
+        maze.remove_wall({ .column = 1, .row = 1 }, GridMazes::Direction::right);
+        REQUIRE_FALSE(maze.is_full());
     }
 }

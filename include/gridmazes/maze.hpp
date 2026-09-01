@@ -64,6 +64,26 @@ class Maze {
      * */
     void remove_wall(Position position, Direction direction) { set_wall(position, direction, false); }
 
+    /** Toggle the state of the wall in `direction` from `position`.
+     *
+     * The maze must contain `position` and the wall must be internal.
+     * */
+    void toggle_wall(Position position, Direction direction) {
+        set_wall(position, direction, !has_wall(position, direction));
+    }
+
+    /** Remove all internal walls. */
+    void clear() noexcept { m_internal_walls.reset(); }
+
+    /** Return true if the maze has no internal walls. */
+    [[nodiscard]] bool is_empty() const noexcept { return m_internal_walls.none(); }
+
+    /** Place all internal walls. */
+    void fill() noexcept { m_internal_walls.set(); }
+
+    /** Return true if the maze has all internal walls present. */
+    [[nodiscard]] bool is_full() const noexcept { return m_internal_walls.all(); }
+
   private:
     int m_width;
     int m_height;
