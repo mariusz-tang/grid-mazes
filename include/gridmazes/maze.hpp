@@ -26,6 +26,12 @@ class Maze {
     /** Return true if `position` is within the bounds of this maze. */
     [[nodiscard]] bool contains_position(Position position) const noexcept;
 
+    /** Return the positions contained within the maze.
+     *
+     * The behaviour if the maze changes size is undefined.
+     * */
+    [[nodiscard]] std::generator<Position> positions() const noexcept;
+
     /** Return true if the wall is on the boundary of the maze.
      *
      * The maze must contain `position`.
@@ -57,12 +63,6 @@ class Maze {
      * The maze must contain `position` and the wall must be internal.
      * */
     void remove_wall(Position position, Direction direction) { set_wall(position, direction, false); }
-
-    /** Return the positions contained within the maze.
-     *
-     * The behaviour if the maze changes size is undefined.
-     * */
-    [[nodiscard]] std::generator<Position> positions() const noexcept;
 
   private:
     int m_width;
