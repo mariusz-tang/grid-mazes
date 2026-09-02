@@ -83,6 +83,14 @@ TEST_CASE("maze internal cells", "[maze]") {
         }
     }
 
+    SECTION("wall setters throw on external walls") {
+        if (maze.is_external_wall(position, direction)) {
+            REQUIRE_THROWS(maze.place_wall(position, direction));
+            REQUIRE_THROWS(maze.remove_wall(position, direction));
+            REQUIRE_THROWS(maze.toggle_wall(position, direction));
+        }
+    }
+
     SECTION("walls do not affect other walls") {
         const auto wall_column { GENERATE_COPY(range(0, width)) };
         const auto wall_row { GENERATE_COPY(range(0, height)) };
@@ -129,6 +137,31 @@ TEST_CASE("maze external cells", "[maze]") {
             REQUIRE_THROWS(maze.has_wall(position, direction));
         }
     }
+}
+
+TEST_CASE("maze clear", "[maze]") {
+    const auto width { 4 };
+    const auto height { 3 };
+    GridMazes::Maze maze { width, height };
+    maze.fill();
+    maze.clear();
+    REQUIRE_FALSE(maze.has_wall({ 0, 0 }, GridMazes::Direction::right));
+    REQUIRE_FALSE(maze.has_wall({ 0, 1 }, GridMazes::Direction::right));
+    REQUIRE_FALSE(maze.has_wall({ 0, 2 }, GridMazes::Direction::right));
+    REQUIRE_FALSE(maze.has_wall({ 1, 0 }, GridMazes::Direction::right));
+    REQUIRE_FALSE(maze.has_wall({ 1, 1 }, GridMazes::Direction::right));
+    REQUIRE_FALSE(maze.has_wall({ 1, 2 }, GridMazes::Direction::right));
+    REQUIRE_FALSE(maze.has_wall({ 2, 0 }, GridMazes::Direction::right));
+    REQUIRE_FALSE(maze.has_wall({ 2, 1 }, GridMazes::Direction::right));
+    REQUIRE_FALSE(maze.has_wall({ 2, 2 }, GridMazes::Direction::right));
+    REQUIRE_FALSE(maze.has_wall({ 0, 0 }, GridMazes::Direction::down));
+    REQUIRE_FALSE(maze.has_wall({ 0, 1 }, GridMazes::Direction::down));
+    REQUIRE_FALSE(maze.has_wall({ 1, 0 }, GridMazes::Direction::down));
+    REQUIRE_FALSE(maze.has_wall({ 1, 1 }, GridMazes::Direction::down));
+    REQUIRE_FALSE(maze.has_wall({ 2, 0 }, GridMazes::Direction::down));
+    REQUIRE_FALSE(maze.has_wall({ 2, 1 }, GridMazes::Direction::down));
+    REQUIRE_FALSE(maze.has_wall({ 3, 0 }, GridMazes::Direction::down));
+    REQUIRE_FALSE(maze.has_wall({ 3, 1 }, GridMazes::Direction::down));
 }
 
 TEST_CASE("maze is_empty", "[maze]") {
