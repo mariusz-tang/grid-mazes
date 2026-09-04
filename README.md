@@ -4,7 +4,7 @@ C++ library for generating and solving 2D grid mazes.
 
 ## Dependencies
 
-- Boost (for `boost::dynamic_bitset`).
+- Boost (for dynamic bitsets and hashing utilities).
 - Catch2 (for unit tests). (downloaded using `FetchContent`)
 
 ## Setup
@@ -42,7 +42,6 @@ prek --install
 prek --all-files
 ```
 
-The `clang-tidy` and `clang-format` hooks require these programs to be installed
-on the system. The `clang-tidy` hook additionally requires a compilation database
-in `build/`. Using Makefile generators and following the setup above, this should
-already be populated.
+There is no `clang-tidy` hook enabled because I have consistently experienced
+issues using them, including false positivies and inconsistent output compared
+to `run-clang-tidy`. Please run `clang-tidy` manually as needed.

@@ -1,6 +1,6 @@
 #include "gridmazes/maze.hpp"
 
-#include "gridmazes/position.hpp"
+#include "gridmazes/grid.hpp"
 
 #include <cassert>
 #include <cstddef>
@@ -9,12 +9,15 @@
 #include <stdexcept>
 
 namespace GridMazes {
-
 using enum Direction;
 
+namespace {
+/** Return the number of internal walls in a `width` by `height` maze. */
+[[nodiscard]] std::size_t num_internal_walls(int width, int height) { return (2 * width * height) - width - height; }
+} // namespace
+
 Maze::Maze(int width, int height)
-    : m_width { width }, m_height { height },
-      m_internalWalls { static_cast<std::size_t>((2 * width * height) - width - height) } {
+    : m_width { width }, m_height { height }, m_internalWalls { num_internal_walls(width, height) } {
     if (m_width <= 0 || m_height <= 0) {
         throw std::runtime_error { std::format("width and height must be strictly positive, but "
                                                "received {} and {}",
@@ -22,92 +25,119 @@ Maze::Maze(int width, int height)
     }
 }
 
-bool Maze::contains_position(Position position) const noexcept {
-    const auto has_column { 0 <= position.column && position.column < m_width };
-    const auto has_row { 0 <= position.row && position.row < m_height };
+bool Maze::contains(const Cell& cell) const noexcept {
+    const bool has_column { 0 <= cell.x && cell.x < m_width };
+    const bool has_row { 0 <= cell.y && cell.y < m_height };
     return has_column && has_row;
 }
 
-bool Maze::has_wall(Position position, Direction direction) const {
-    if (!contains_position(position)) {
-        throw std::runtime_error { std::format("maze with width {} and height {} does not contain position {}", m_width,
-                                               m_height, position) };
-    }
+bool Maze::contains(const Wall& wall) const noexcept {
+    int max_line {};
+    int max_offset {};
 
-    // External walls are always present.
-    if (is_external_wall(position, direction)) {
-        return true;
+    switch (wall.orientation) {
+    case Orientation::horizontal:
+        max_offset = m_width - 1;
+        max_line = m_height;
+        break;
+    case Orientation::vertical:
+        max_offset = m_height - 1;
+        max_line = m_width;
+        break;
     }
-    return m_internalWalls[get_wall_index(position, direction)];
+    const bool has_line { 0 <= wall.line && wall.line <= max_line };
+    const bool has_offset { 0 <= wall.offset && wall.offset <= max_offset };
+    return has_line && has_offset;
 }
 
-void Maze::set_wall(Position position, Direction direction, bool state) {
-    if (!contains_position(position)) {
-        throw std::runtime_error { std::format("maze with width {} and height {} does not contain position {}", m_width,
-                                               m_height, position) };
+bool Maze::is_boundary(const Wall& wall) const noexcept {
+    if (!contains(wall)) {
+        return false;
     }
 
-    // External walls are always present.
-    if (is_external_wall(position, direction)) {
-        throw std::runtime_error { std::format("tried to set an external wall", m_width, m_height, position) };
+    switch (wall.orientation) {
+    case Orientation::horizontal:
+        return wall.line == 0 || wall.line == height();
+    case Orientation::vertical:
+        return wall.line == 0 || wall.line == width();
     }
-    m_internalWalls[get_wall_index(position, direction)] = state;
 }
 
-bool Maze::is_external_wall(Position position, Direction direction) const {
-    if (!contains_position(position)) {
-        throw std::runtime_error { std::format("maze with width {} and height {} does not contain position {}", m_width,
-                                               m_height, position) };
-    }
+bool Maze::is_internal(const Wall& wall) const noexcept { return contains(wall) && !is_boundary(wall); }
 
-    switch (direction) {
-    case up:
-        return position.row == 0;
-    case down:
-        return position.row == m_height - 1;
-    case left:
-        return position.column == 0;
-    case right:
-        return position.column == m_width - 1;
-    }
-    throw std::runtime_error { "invalid direction" };
-}
-
-/** Get the index in m_walls corresponding to this wall. */
-int Maze::get_wall_index(Position position, Direction direction) const {
-    assert(contains_position(position));
-    assert(is_internal_wall(position, direction));
-
-    // Normalize to face up or left.
-    if (direction == down || direction == right) {
-        position = position.get_neighbour(direction);
-        direction = get_opposite(direction);
-    }
-
-    // Horizontal walls above cells in the first column.
-    if (position.column == 0 && direction == up) {
-        return position.row - 1;
-    }
-
-    // Vertical walls to the left of cells in the first row.
-    if (position.row == 0 && direction == left) {
-        return m_height - 1 + position.column - 1;
-    }
-
-    // Walls above or to the left of the other cells in reading order.
-    const auto offset { m_width + m_height - 2 };
-    const auto position_index { position.column - 1 + ((m_width - 1) * (position.row - 1)) };
-    if (direction == up) {
-        return offset + (2 * position_index);
-    }
-    return offset + (2 * position_index) + 1;
-}
-
-std::generator<Position> Maze::positions() const noexcept {
+std::generator<const Cell&> Maze::cells() const noexcept {
     for (int column { 0 }; column < m_width; column++) {
         for (int row { 0 }; row < m_height; row++) {
-            co_yield { .column = column, .row = row };
+            co_yield { .x = column, .y = row };
         }
+    }
+}
+
+std::generator<const Wall&> Maze::walls() const noexcept {
+    for (int line { 0 }; line <= m_height; line++) {
+        for (int offset { 0 }; offset < m_width; offset++) {
+            co_yield { .line = line, .offset = offset, .orientation = Orientation::horizontal };
+        }
+    }
+    for (int line { 0 }; line <= m_width; line++) {
+        for (int offset { 0 }; offset < m_height; offset++) {
+            co_yield { .line = line, .offset = offset, .orientation = Orientation::vertical };
+        }
+    }
+}
+
+namespace {
+/** Get the unique index of an internal wall in a maze. */
+[[nodiscard]] int get_internal_wall_index(const Maze& maze, const Wall& wall) {
+    assert(maze.is_internal(wall));
+
+    switch (wall.orientation) {
+    case Orientation::horizontal:
+        // Horizontal walls in reading order...
+        return ((wall.line - 1) * maze.width()) + wall.offset;
+    case Orientation::vertical:
+        // ...followed by vertical walls in column order.
+        const int numHorizontalWalls { maze.width() * (maze.height() - 1) };
+        return numHorizontalWalls + ((wall.line - 1) * maze.height()) + wall.offset;
+    }
+}
+} // namespace
+
+[[nodiscard]] bool Maze::is_set(const Wall& wall) const noexcept {
+    if (!contains(wall)) {
+        return false;
+    }
+    if (is_boundary(wall)) {
+        return true;
+    }
+    return m_internalWalls[get_internal_wall_index(*this, wall)];
+}
+
+namespace {
+/** Throw an exception if `wall` cannot be set/unset in `maze`. */
+void throw_if_immutable(const Maze& maze, const Wall& wall) {
+    if (!maze.is_internal(wall)) {
+        throw std::runtime_error("tried to set or unset an internal wall");
+    }
+}
+} // namespace
+
+void Maze::set(const Wall& wall) {
+    throw_if_immutable(*this, wall);
+    m_internalWalls[get_internal_wall_index(*this, wall)] = true;
+}
+
+void Maze::unset(const Wall& wall) {
+    throw_if_immutable(*this, wall);
+    m_internalWalls[get_internal_wall_index(*this, wall)] = false;
+}
+
+void Maze::toggle(const Wall& wall) {
+    throw_if_immutable(*this, wall);
+    if (is_set(wall)) {
+        unset(wall);
+    } else {
+        set(wall);
     }
 }
 } // namespace GridMazes

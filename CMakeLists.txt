@@ -13,13 +13,13 @@ find_package(Boost REQUIRED)
 add_library(GridMazes)
 target_sources(
     GridMazes
-    PRIVATE src/maze.cpp src/position.cpp src/renderers/text.cpp
+    PRIVATE src/maze.cpp src/renderers/text.cpp
     PUBLIC
         FILE_SET HEADERS
             BASE_DIRS include
             FILES
+                include/gridmazes/grid.hpp
                 include/gridmazes/maze.hpp
-                include/gridmazes/position.hpp
                 include/gridmazes/renderers/text.hpp
 )
 target_link_libraries(GridMazes PUBLIC Boost::headers)

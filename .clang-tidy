@@ -1,7 +1,7 @@
 Checks: "*, -abseil-*, -altera-*, -android-*, -fuchsia-*, -google-*, -llvm*, -modernize-use-trailing-return-type, -zircon-*, -readability-else-after-return, -readability-static-accessed-through-instance, -readability-avoid-const-params-in-decls, -cppcoreguidelines-non-private-member-variables-in-classes, -misc-non-private-member-variables-in-classes, -portability-avoid-pragma-once, -cppcoreguidelines-pro-bounds-avoid-unchecked-container-access, -clang-analyzer-optin.core.EnumCastOutOfRange, -hicpp-static-assert, -misc-static-assert, -cert-dcl03-c"
 # Get rid of misc-static-assert because it keeps false positives.
 CheckOptions:
-  bugprone-easily-swappable-parameters.IgnoredParameterNames: 'width;height;column;row'
+  bugprone-easily-swappable-parameters.IgnoredParameterNames: 'width;height;direction;distance'
   # Prevent diving into Catch2 macros. We should be avoiding macros in our own code anyway.
   readability-function-cognitive-complexity.IgnoreMacros: true
 WarningsAsErrors: "*"

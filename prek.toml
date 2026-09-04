@@ -26,16 +26,9 @@ rev = "v0.49.1"
 hooks = [{ id = "markdownlint" }]
 
 [[repos]]
-repo = "https://github.com/pocc/pre-commit-hooks"
-rev = "v1.3.5"
-hooks = [
-  { id = "clang-format" },
-  {
-    id = "clang-tidy",
-    # -quiet is necessary to prevent hook failure.
-    args = ["-p=build", "-quiet"],
-  },
-]
+repo = "https://github.com/pre-commit/mirrors-clang-format"
+rev = "v23.1.0"
+hooks = [{ id = "clang-format", types_or = ["c++"] }]
 
 [[repos]]
 repo = "https://github.com/tombi-toml/tombi-pre-commit"

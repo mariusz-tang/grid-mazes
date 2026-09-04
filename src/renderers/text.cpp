@@ -1,7 +1,7 @@
 #include "gridmazes/renderers/text.hpp"
 
+#include "gridmazes/grid.hpp"
 #include "gridmazes/maze.hpp"
-#include "gridmazes/position.hpp"
 
 #include <cassert>
 #include <cstddef>
@@ -9,15 +9,15 @@
 
 namespace GridMazes::Render {
 namespace {
-constexpr char wall = 'X';
-constexpr char empty = ' ';
+constexpr char wallMarker = 'X';
+constexpr char emptyMarker = ' ';
 
 /** Create an alternating row with `num_cells` empty spaces. */
 std::string make_alternating_row(int numCells) {
-    std::string row { wall };
+    std::string row { wallMarker };
     for (int i { 0 }; i < numCells; i++) {
-        row += empty;
-        row += wall;
+        row += emptyMarker;
+        row += wallMarker;
     }
     return row;
 }
@@ -37,8 +37,8 @@ std::string make_frame(int width, int height) {
 
     // A wall and an empty for each cell, plus the right/bottom-most walls.
     const int frameWidth { frame_width(width) };
-    const std::string rowFull(frameWidth, wall);
-    const std::string rowEmpty { wall + std::string(frameWidth - 2, empty) + wall };
+    const std::string rowFull(frameWidth, wallMarker);
+    const std::string rowEmpty { wallMarker + std::string(frameWidth - 2, emptyMarker) + wallMarker };
     const std::string rowAlternating { make_alternating_row(width) };
 
     // Top boundary and first row cells.
@@ -56,24 +56,26 @@ std::string make_frame(int width, int height) {
     return frame;
 }
 
-/** Return the index of the wall in `direction` from `position`. */
-std::size_t get_index(int frameWidth, Position position, Direction direction) {
-    assert(direction == Direction::right || direction == Direction::down);
-
+/** Return the index of the wall in a maze string with the given width. */
+std::size_t get_index(int frameWidth, const Wall& wall) {
     // Every second row/column is a corner.
-    int column { (2 * position.column) + 1 };
-    int row { (2 * position.row) + 1 };
+    int column {};
+    int row {};
 
-    if (direction == Direction::right) {
-        column++;
-    } else if (direction == Direction::down) {
-        row++;
+    switch (wall.orientation) {
+    case Orientation::horizontal:
+        column = (2 * wall.offset) + 1;
+        row = (2 * wall.line);
+        break;
+    case Orientation::vertical:
+        column = (2 * wall.line);
+        row = (2 * wall.offset) + 1;
+        break;
     }
 
-    // Prevent widening conversion.
+    // Cast to prevent widening conversion.
     return (static_cast<long>(row * (frameWidth + 1))) + column;
 }
-
 } // namespace
 
 std::string to_text(const Maze& maze) {
@@ -82,12 +84,9 @@ std::string to_text(const Maze& maze) {
 
     // Insert walls where present.
     const auto frameWidth { frame_width(maze.width()) };
-    for (const auto& position : maze.positions()) {
-        if (maze.has_wall(position, Direction::right)) {
-            result[get_index(frameWidth, position, Direction::right)] = wall;
-        }
-        if (maze.has_wall(position, Direction::down)) {
-            result[get_index(frameWidth, position, Direction::down)] = wall;
+    for (const auto& wall : maze.walls()) {
+        if (maze.is_internal(wall) && maze.is_set(wall)) {
+            result[get_index(frameWidth, wall)] = wallMarker;
         }
     }
     return result;

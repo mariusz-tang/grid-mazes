@@ -1,3 +1,4 @@
+#pragma once
 #include "gridmazes/maze.hpp"
 
 #include <string>
@@ -16,7 +17,6 @@ namespace GridMazes::Render {
  * X   X X
  * XXXXXXX
  *
- * Newlines are placed inside the string but not at the end.
- * */
+ * Newlines are placed inside the string but not at the end. */
 [[nodiscard]] std::string to_text(const Maze& maze);
 } // namespace GridMazes::Render

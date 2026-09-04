@@ -1,216 +1,283 @@
+#include "gridmazes/grid.hpp"
 #include "gridmazes/maze.hpp"
-#include "gridmazes/position.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
-#include <catch2/generators/catch_generators_range.hpp>
+#include <iterator>
+#include <ranges>
+#include <unordered_set>
 
-TEST_CASE("maze width and height", "[maze]") {
-    const auto width { GENERATE(range(1, 10)) };
-    const auto height { GENERATE(range(1, 10)) };
-    const GridMazes::Maze maze { width, height };
+using namespace GridMazes;
+using enum Direction;
 
-    REQUIRE(maze.height() == height);
-    REQUIRE(maze.width() == width);
+TEST_CASE("maze constructor accepts positive width and height", "[maze]") {
+    REQUIRE_NOTHROW(Maze { 1, 1 });
+    REQUIRE_NOTHROW(Maze { 2, 2 });
+    REQUIRE_NOTHROW(Maze { 3, 1 });
+    REQUIRE_NOTHROW(Maze { 1, 3 });
+    REQUIRE_NOTHROW(Maze { 9, 2 });
 }
 
 TEST_CASE("maze constructor throws if either dimension is non-positive", "[maze]") {
-    const auto bad_dimension_0 { GENERATE(range(-3, 1)) };
-    const auto bad_dimension_1 { GENERATE(range(-3, 1)) };
-    REQUIRE_THROWS(GridMazes::Maze { 1, bad_dimension_0 });
-    REQUIRE_THROWS(GridMazes::Maze { bad_dimension_0, 1 });
-    REQUIRE_THROWS(GridMazes::Maze { bad_dimension_0, bad_dimension_1 });
+    REQUIRE_THROWS(Maze { 1, 0 });
+    REQUIRE_THROWS(Maze { 0, 1 });
+    REQUIRE_THROWS(Maze { 0, 0 });
+    REQUIRE_THROWS(Maze { 10, -1 });
+    REQUIRE_THROWS(Maze { -1, 2 });
+    REQUIRE_THROWS(Maze { -1, -3 });
 }
 
-TEST_CASE("maze internal cells", "[maze]") {
-    const auto width { 11 };
-    const auto height { 5 };
-    GridMazes::Maze maze { width, height };
+TEST_CASE("maze width and height", "[maze]") {
+    const Maze maze { 4, 2 };
+    REQUIRE(maze.width() == 4);
+    REQUIRE(maze.height() == 2);
+}
 
-    const auto column { GENERATE_COPY(range(0, width)) };
-    const auto row { GENERATE_COPY(range(0, height)) };
-    const GridMazes::Position position { .column = column, .row = row };
+TEST_CASE("maze contains cell", "[maze]") {
+    const Maze maze { 5, 2 };
+    REQUIRE(maze.contains(Cell { 0, 0 }));
+    REQUIRE(maze.contains(Cell { 1, 0 }));
+    REQUIRE(maze.contains(Cell { 2, 0 }));
+    REQUIRE(maze.contains(Cell { 3, 0 }));
+    REQUIRE(maze.contains(Cell { 4, 0 }));
+    REQUIRE(maze.contains(Cell { 0, 1 }));
+    REQUIRE(maze.contains(Cell { 1, 1 }));
+    REQUIRE(maze.contains(Cell { 2, 1 }));
+    REQUIRE(maze.contains(Cell { 3, 1 }));
+    REQUIRE(maze.contains(Cell { 4, 1 }));
+    REQUIRE_FALSE(maze.contains(Cell { -5, -5 }));
+    REQUIRE_FALSE(maze.contains(Cell { 0, -1 }));
+    REQUIRE_FALSE(maze.contains(Cell { -1, 0 }));
+    REQUIRE_FALSE(maze.contains(Cell { -1, -1 }));
+    REQUIRE_FALSE(maze.contains(Cell { 4, 2 }));
+    REQUIRE_FALSE(maze.contains(Cell { 5, 1 }));
+    REQUIRE_FALSE(maze.contains(Cell { 5, 2 }));
+    REQUIRE_FALSE(maze.contains(Cell { 10, 10 }));
+}
 
-    const auto direction { GENERATE(from_range(GridMazes::directions)) };
+TEST_CASE("maze contains wall", "[maze]") {
+    const Maze maze { 2, 3 };
+    REQUIRE(maze.contains(Cell { 0, 0 }.wall(up)));
+    REQUIRE(maze.contains(Cell { 1, 0 }.wall(up)));
+    REQUIRE(maze.contains(Cell { 0, 1 }.wall(up)));
+    REQUIRE(maze.contains(Cell { 1, 1 }.wall(up)));
+    REQUIRE(maze.contains(Cell { 0, 2 }.wall(up)));
+    REQUIRE(maze.contains(Cell { 1, 2 }.wall(up)));
+    REQUIRE(maze.contains(Cell { 0, 2 }.wall(down)));
+    REQUIRE(maze.contains(Cell { 1, 2 }.wall(down)));
+    REQUIRE(maze.contains(Cell { 0, 0 }.wall(left)));
+    REQUIRE(maze.contains(Cell { 0, 1 }.wall(left)));
+    REQUIRE(maze.contains(Cell { 0, 2 }.wall(left)));
+    REQUIRE(maze.contains(Cell { 1, 0 }.wall(left)));
+    REQUIRE(maze.contains(Cell { 1, 1 }.wall(left)));
+    REQUIRE(maze.contains(Cell { 1, 2 }.wall(left)));
+    REQUIRE(maze.contains(Cell { 1, 0 }.wall(right)));
+    REQUIRE(maze.contains(Cell { 1, 1 }.wall(right)));
+    REQUIRE(maze.contains(Cell { 1, 2 }.wall(right)));
+    REQUIRE_FALSE(maze.contains(Cell { 0, -1 }.wall(up)));
+    REQUIRE_FALSE(maze.contains(Cell { 0, 3 }.wall(down)));
+    REQUIRE_FALSE(maze.contains(Cell { -1, 0 }.wall(left)));
+    REQUIRE_FALSE(maze.contains(Cell { 3, 2 }.wall(right)));
+}
 
-    SECTION("contains_position returns true") { REQUIRE(maze.contains_position(position)); }
+TEST_CASE("maze boundary walls", "[maze]") {
+    const Maze maze { 2, 3 };
+    REQUIRE(maze.is_boundary(Cell { 0, 0 }.wall(up)));
+    REQUIRE(maze.is_boundary(Cell { 1, 0 }.wall(up)));
+    REQUIRE(maze.is_boundary(Cell { 0, 2 }.wall(down)));
+    REQUIRE(maze.is_boundary(Cell { 1, 2 }.wall(down)));
+    REQUIRE(maze.is_boundary(Cell { 0, 0 }.wall(left)));
+    REQUIRE(maze.is_boundary(Cell { 0, 1 }.wall(left)));
+    REQUIRE(maze.is_boundary(Cell { 0, 2 }.wall(left)));
+    REQUIRE(maze.is_boundary(Cell { 1, 0 }.wall(right)));
+    REQUIRE(maze.is_boundary(Cell { 1, 1 }.wall(right)));
+    REQUIRE(maze.is_boundary(Cell { 1, 2 }.wall(right)));
 
-    SECTION("internal and external walls") {
-        if ((column == 0 && direction == GridMazes::Direction::left) ||
-            (column == maze.width() - 1 && direction == GridMazes::Direction::right) ||
-            (row == 0 && direction == GridMazes::Direction::up) ||
-            (row == maze.height() - 1 && direction == GridMazes::Direction::down)) {
-            REQUIRE(maze.is_external_wall(position, direction));
-            REQUIRE_FALSE(maze.is_internal_wall(position, direction));
-        } else {
-            REQUIRE(maze.is_internal_wall(position, direction));
-            REQUIRE_FALSE(maze.is_external_wall(position, direction));
+    // Internal.
+    REQUIRE_FALSE(maze.is_boundary(Cell { 0, 1 }.wall(up)));
+    REQUIRE_FALSE(maze.is_boundary(Cell { 1, 1 }.wall(up)));
+    REQUIRE_FALSE(maze.is_boundary(Cell { 0, 2 }.wall(up)));
+    REQUIRE_FALSE(maze.is_boundary(Cell { 1, 2 }.wall(up)));
+    REQUIRE_FALSE(maze.is_boundary(Cell { 1, 0 }.wall(left)));
+    REQUIRE_FALSE(maze.is_boundary(Cell { 1, 1 }.wall(left)));
+    REQUIRE_FALSE(maze.is_boundary(Cell { 1, 2 }.wall(left)));
+
+    // External.
+    REQUIRE_FALSE(maze.is_boundary(Cell { 0, -1 }.wall(up)));
+    REQUIRE_FALSE(maze.is_boundary(Cell { 0, 3 }.wall(down)));
+    REQUIRE_FALSE(maze.is_boundary(Cell { -1, 0 }.wall(left)));
+    REQUIRE_FALSE(maze.is_boundary(Cell { 3, 2 }.wall(right)));
+}
+
+TEST_CASE("maze internal walls", "[maze]") {
+    const Maze maze { 2, 3 };
+    REQUIRE(maze.is_internal(Cell { 0, 1 }.wall(up)));
+    REQUIRE(maze.is_internal(Cell { 1, 1 }.wall(up)));
+    REQUIRE(maze.is_internal(Cell { 0, 2 }.wall(up)));
+    REQUIRE(maze.is_internal(Cell { 1, 2 }.wall(up)));
+    REQUIRE(maze.is_internal(Cell { 1, 0 }.wall(left)));
+    REQUIRE(maze.is_internal(Cell { 1, 1 }.wall(left)));
+    REQUIRE(maze.is_internal(Cell { 1, 2 }.wall(left)));
+
+    // Boundary.
+    REQUIRE_FALSE(maze.is_internal(Cell { 0, 0 }.wall(up)));
+    REQUIRE_FALSE(maze.is_internal(Cell { 1, 0 }.wall(up)));
+    REQUIRE_FALSE(maze.is_internal(Cell { 0, 2 }.wall(down)));
+    REQUIRE_FALSE(maze.is_internal(Cell { 1, 2 }.wall(down)));
+    REQUIRE_FALSE(maze.is_internal(Cell { 0, 0 }.wall(left)));
+    REQUIRE_FALSE(maze.is_internal(Cell { 0, 1 }.wall(left)));
+    REQUIRE_FALSE(maze.is_internal(Cell { 0, 2 }.wall(left)));
+    REQUIRE_FALSE(maze.is_internal(Cell { 1, 0 }.wall(right)));
+    REQUIRE_FALSE(maze.is_internal(Cell { 1, 1 }.wall(right)));
+    REQUIRE_FALSE(maze.is_internal(Cell { 1, 2 }.wall(right)));
+
+    // External.
+    REQUIRE_FALSE(maze.is_internal(Cell { 0, -1 }.wall(up)));
+    REQUIRE_FALSE(maze.is_internal(Cell { 0, 3 }.wall(down)));
+    REQUIRE_FALSE(maze.is_internal(Cell { -1, 0 }.wall(left)));
+    REQUIRE_FALSE(maze.is_internal(Cell { 3, 2 }.wall(right)));
+}
+
+TEST_CASE("maze cells generator", "[maze]") {
+    const Maze maze { 5, 6 };
+    const int numCells { 30 };
+    const std::unordered_set uniqueReturnedCells(std::from_range, maze.cells());
+    const long numUniqueReturnedCells { static_cast<long>(uniqueReturnedCells.size()) };
+    const long numReturnedCells { std::ranges::distance(maze.cells()) };
+
+    SECTION("returns as many cells as there are in the maze") { REQUIRE(numReturnedCells == numCells); }
+    SECTION("all cells are unique") { REQUIRE(numUniqueReturnedCells == numReturnedCells); }
+    SECTION("the maze contains all cells") {
+        for (const auto& cell : maze.cells()) {
+            REQUIRE(maze.contains(cell));
+        }
+    }
+}
+
+TEST_CASE("maze walls generator", "[maze]") {
+    const Maze maze { 3, 2 };
+    const int numWalls { 17 };
+    const std::unordered_set uniqueReturnedWalls(std::from_range, maze.walls());
+    const long numUniqueReturnedWalls { static_cast<long>(uniqueReturnedWalls.size()) };
+    const long numReturnedWalls { std::ranges::distance(maze.walls()) };
+
+    SECTION("returns as many walls as there are in the maze") { REQUIRE(numReturnedWalls == numWalls); }
+    SECTION("all walls are unique") { REQUIRE(numUniqueReturnedWalls == numReturnedWalls); }
+    SECTION("the maze contains all walls") {
+        for (const auto& wall : maze.walls()) {
+            REQUIRE(maze.contains(wall));
+        }
+    }
+}
+
+TEST_CASE("maze is_set", "[maze]") {
+    const Maze maze { 3, 2 };
+    SECTION("boundary walls are set") {
+        for (const auto& wall : maze.walls()) {
+            if (maze.is_boundary(wall)) {
+                REQUIRE(maze.is_set(wall));
+            }
         }
     }
 
-    SECTION("internal walls are all absent and external all present after"
-            " construction ") {
-        const auto has_wall { maze.has_wall({ .column = column, .row = row }, direction) };
-        if (maze.is_external_wall({ .column = column, .row = row }, direction)) {
-            REQUIRE(has_wall);
-        } else {
-            REQUIRE_FALSE(has_wall);
+    SECTION("external walls are unset") {
+        REQUIRE_FALSE(maze.is_set(Cell { -1, 0 }.wall(left)));
+        REQUIRE_FALSE(maze.is_set(Cell { -1, -1 }.wall(up)));
+        REQUIRE_FALSE(maze.is_set(Cell { 3, 2 }.wall(left)));
+    }
+}
+
+TEST_CASE("maze setters", "[maze]") {
+    Maze maze { 3, 2 };
+
+    SECTION("internal walls can be set, unset, and toggled") {
+        for (const auto& wall : maze.walls()) {
+            if (!maze.is_internal(wall)) {
+                continue;
+            }
+            REQUIRE_FALSE(maze.is_set(wall));
+            maze.set(wall);
+            REQUIRE(maze.is_set(wall));
+            maze.unset(wall);
+            REQUIRE_FALSE(maze.is_set(wall));
+            maze.toggle(wall);
+            REQUIRE(maze.is_set(wall));
+            maze.toggle(wall);
+            REQUIRE_FALSE(maze.is_set(wall));
         }
     }
+    SECTION("walls do not affect each other") {
+        const Wall myWall { Cell { .x = 0, .y = 0 }.wall(right) };
+        maze.set(myWall);
+        REQUIRE(maze.is_set(myWall));
 
-    SECTION("walls have the same value from both sides") {
-        if (maze.is_internal_wall(position, direction)) {
-            maze.place_wall(position, direction);
-
-            const auto opposite_position { position.get_neighbour(direction) };
-            const auto opposite_direction { GridMazes::get_opposite(direction) };
-
-            REQUIRE(maze.has_wall(position, direction));
-            REQUIRE(maze.has_wall(opposite_position, opposite_direction));
-
-            maze.remove_wall(position, direction);
-            REQUIRE_FALSE(maze.has_wall(position, direction));
-            REQUIRE_FALSE(maze.has_wall(opposite_position, opposite_direction));
-        }
-    }
-
-    SECTION("toggle_wall") {
-        if (maze.is_internal_wall(position, direction)) {
-            maze.toggle_wall(position, direction);
-            REQUIRE(maze.has_wall(position, direction));
-            maze.toggle_wall(position, direction);
-            REQUIRE_FALSE(maze.has_wall(position, direction));
-        }
-    }
-
-    SECTION("wall setters throw on external walls") {
-        if (maze.is_external_wall(position, direction)) {
-            REQUIRE_THROWS(maze.place_wall(position, direction));
-            REQUIRE_THROWS(maze.remove_wall(position, direction));
-            REQUIRE_THROWS(maze.toggle_wall(position, direction));
-        }
-    }
-
-    SECTION("walls do not affect other walls") {
-        const auto wall_column { GENERATE_COPY(range(0, width)) };
-        const auto wall_row { GENERATE_COPY(range(0, height)) };
-
-        // Pick a TEST wall.
-        const GridMazes::Position wall_position { .column = wall_column, .row = wall_row };
-        const auto wall_direction { GENERATE(GridMazes::Direction::down, GridMazes::Direction::right) };
-
-        // Store the TEST wall from the opposite cell as well.
-        const auto opposite_position { wall_position.get_neighbour(wall_direction) };
-        const auto opposite_direction { GridMazes::get_opposite(wall_direction) };
-
-        // If both walls are internal.
-        if (maze.is_internal_wall(position, direction) && maze.is_internal_wall(wall_position, wall_direction)) {
-            // Set the TEST wall.
-            maze.place_wall(wall_position, wall_direction);
-            REQUIRE(maze.has_wall(wall_position, wall_direction));
-
-            // If the current wall is different from the TEST wall...
-            const bool different_wall { (position != wall_position || direction != wall_direction) &&
-                                        (position != opposite_position || direction != opposite_direction) };
-            if (different_wall) {
-                // ...then it should still be unset.
-                REQUIRE_FALSE(maze.has_wall(position, direction));
+        for (const auto& wall : maze.walls()) {
+            if (maze.is_internal(wall) && wall != myWall) {
+                REQUIRE_FALSE(maze.is_set(wall));
             }
         }
     }
 }
 
-TEST_CASE("maze external cells", "[maze]") {
-    const GridMazes::Maze maze { 5, 8 };
-    const auto position { GENERATE(GridMazes::Position { 0, -1 }, GridMazes::Position { -1, 0 },
-                                   GridMazes::Position { 5, 0 }, GridMazes::Position { 0, 8 },
-                                   GridMazes::Position { -1, -1 }, GridMazes::Position { 5, 8 },
-                                   GridMazes::Position { -2, 4 }, GridMazes::Position { 4, 10 },
-                                   GridMazes::Position { 4, 9 }, GridMazes::Position { 6, 4 }) };
+TEST_CASE("maze set_all", "[maze]") {
+    Maze maze { 15, 4 }; // NOLINT (magic numbers)
 
-    SECTION("contains_position returns false") { REQUIRE_FALSE(maze.contains_position(position)); }
-
-    SECTION("wall functions throw") {
-        for (const auto direction : GridMazes::directions) {
-            REQUIRE_THROWS(maze.is_internal_wall(position, direction));
-            REQUIRE_THROWS(maze.is_external_wall(position, direction));
-            REQUIRE_THROWS(maze.has_wall(position, direction));
+    for (const auto& wall : maze.walls()) {
+        if (maze.is_internal(wall)) {
+            REQUIRE_FALSE(maze.is_set(wall));
+        }
+    }
+    maze.set_all();
+    for (const auto& wall : maze.walls()) {
+        if (maze.is_internal(wall)) {
+            REQUIRE(maze.is_set(wall));
         }
     }
 }
 
-TEST_CASE("maze clear", "[maze]") {
-    const auto width { 4 };
-    const auto height { 3 };
-    GridMazes::Maze maze { width, height };
-    maze.fill();
-    maze.clear();
-    REQUIRE_FALSE(maze.has_wall({ 0, 0 }, GridMazes::Direction::right));
-    REQUIRE_FALSE(maze.has_wall({ 0, 1 }, GridMazes::Direction::right));
-    REQUIRE_FALSE(maze.has_wall({ 0, 2 }, GridMazes::Direction::right));
-    REQUIRE_FALSE(maze.has_wall({ 1, 0 }, GridMazes::Direction::right));
-    REQUIRE_FALSE(maze.has_wall({ 1, 1 }, GridMazes::Direction::right));
-    REQUIRE_FALSE(maze.has_wall({ 1, 2 }, GridMazes::Direction::right));
-    REQUIRE_FALSE(maze.has_wall({ 2, 0 }, GridMazes::Direction::right));
-    REQUIRE_FALSE(maze.has_wall({ 2, 1 }, GridMazes::Direction::right));
-    REQUIRE_FALSE(maze.has_wall({ 2, 2 }, GridMazes::Direction::right));
-    REQUIRE_FALSE(maze.has_wall({ 0, 0 }, GridMazes::Direction::down));
-    REQUIRE_FALSE(maze.has_wall({ 0, 1 }, GridMazes::Direction::down));
-    REQUIRE_FALSE(maze.has_wall({ 1, 0 }, GridMazes::Direction::down));
-    REQUIRE_FALSE(maze.has_wall({ 1, 1 }, GridMazes::Direction::down));
-    REQUIRE_FALSE(maze.has_wall({ 2, 0 }, GridMazes::Direction::down));
-    REQUIRE_FALSE(maze.has_wall({ 2, 1 }, GridMazes::Direction::down));
-    REQUIRE_FALSE(maze.has_wall({ 3, 0 }, GridMazes::Direction::down));
-    REQUIRE_FALSE(maze.has_wall({ 3, 1 }, GridMazes::Direction::down));
-}
+TEST_CASE("maze unset_all", "[maze]") {
+    Maze maze { 15, 4 }; // NOLINT (magic numbers)
 
-TEST_CASE("maze is_empty", "[maze]") {
-    const auto width { 4 };
-    const auto height { 2 };
-    GridMazes::Maze maze { width, height };
-
-    SECTION("maze is empty on construction") { REQUIRE(maze.is_empty()); }
-    SECTION("adding a wall makes it non-empty and removing it makes it empty again") {
-        maze.place_wall({ .column = 2, .row = 1 }, GridMazes::Direction::right);
-        REQUIRE_FALSE(maze.is_empty());
-        maze.remove_wall({ .column = 2, .row = 1 }, GridMazes::Direction::right);
-        REQUIRE(maze.is_empty());
+    maze.set_all();
+    for (const auto& wall : maze.walls()) {
+        if (maze.is_internal(wall)) {
+            REQUIRE(maze.is_set(wall));
+        }
     }
-    SECTION("clearing a maze makes it empty") {
-        maze.place_wall({ .column = 2, .row = 1 }, GridMazes::Direction::right);
-        maze.place_wall({ .column = 1, .row = 1 }, GridMazes::Direction::up);
-        maze.place_wall({ .column = 0, .row = 1 }, GridMazes::Direction::right);
-        REQUIRE_FALSE(maze.is_empty());
-        maze.clear();
-        REQUIRE(maze.is_empty());
+
+    maze.unset_all();
+    for (const auto& wall : maze.walls()) {
+        if (maze.is_internal(wall)) {
+            REQUIRE_FALSE(maze.is_set(wall));
+        }
     }
 }
 
-TEST_CASE("maze fill", "[maze]") {
-    const auto width { 2 };
-    const auto height { 3 };
-    GridMazes::Maze maze { width, height };
-    maze.fill();
-    REQUIRE(maze.has_wall({ 0, 0 }, GridMazes::Direction::right));
-    REQUIRE(maze.has_wall({ 0, 1 }, GridMazes::Direction::right));
-    REQUIRE(maze.has_wall({ 0, 2 }, GridMazes::Direction::right));
-    REQUIRE(maze.has_wall({ 0, 0 }, GridMazes::Direction::down));
-    REQUIRE(maze.has_wall({ 0, 1 }, GridMazes::Direction::down));
-    REQUIRE(maze.has_wall({ 1, 0 }, GridMazes::Direction::down));
-    REQUIRE(maze.has_wall({ 1, 1 }, GridMazes::Direction::down));
+TEST_CASE("maze constructor produces an empty maze", "[maze]") {
+    const Maze maze { 10, 3 };
+    REQUIRE(maze.all_unset());
+    REQUIRE_FALSE(maze.all_set());
 }
 
-TEST_CASE("maze is_full", "[maze]") {
-    const auto width { 3 };
-    const auto height { 3 };
-    GridMazes::Maze maze { width, height };
+TEST_CASE("setting any walls makes the maze non-empty", "[maze]") {
+    Maze maze { 10, 3 }; // NOLINT (magic numbers)
 
-    SECTION("maze is not full on construction") { REQUIRE_FALSE(maze.is_full()); }
+    REQUIRE(maze.all_unset());
+    maze.set(Cell { .x = 0, .y = 0 }.wall(right));
+    REQUIRE_FALSE(maze.all_unset());
+}
 
-    SECTION("filling the maze makes it full and then removing a wall makes it not full") {
-        maze.fill();
-        REQUIRE(maze.is_full());
-        maze.remove_wall({ .column = 1, .row = 1 }, GridMazes::Direction::right);
-        REQUIRE_FALSE(maze.is_full());
-    }
+TEST_CASE("unsetting all walls makes the maze empty", "[maze]") {
+    Maze maze { 2, 3 }; // NOLINT (magic numbers)
+
+    maze.set_all();
+    REQUIRE_FALSE(maze.all_unset());
+    maze.unset_all();
+    REQUIRE(maze.all_unset());
+}
+
+TEST_CASE("setting all walls makes the maze full", "[maze]") {
+    Maze maze { 10, 3 }; // NOLINT (magic numbers)
+    REQUIRE_FALSE(maze.all_set());
+    maze.set_all();
+    REQUIRE(maze.all_set());
 }

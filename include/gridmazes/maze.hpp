@@ -1,20 +1,34 @@
 #pragma once
-#include "gridmazes/position.hpp"
+#include "gridmazes/grid.hpp"
 
 #include <boost/dynamic_bitset/dynamic_bitset.hpp>
 #include <generator>
 
 namespace GridMazes {
-/** Represents a 2D grid maze. */
+
+/** Represents a 2D rectangular grid maze.
+ *
+ * A maze has positive integer width and height.
+ *
+ * The maze "contains" all of the cells in the rectangle with corners [0,0]
+ * and [width-1, height-1], inclusive, as well as all of those cells' walls.
+ * These cells are said to be "internal" while all others are "external".
+ *
+ * Walls which separate two internal cells are also said to be "internal". Walls
+ * which separate an internal cell from an external cell are said to be "boundary".
+ * All other walls are said to be "external". Therefore, the maze contains exactly
+ * those walls which are not external.
+ *
+ * Walls can be "set" (impassable) or "unset" (passable). External walls are
+ * always unset, boundary walls are always set, and internal walls may be set
+ * or unset. */
 class Maze {
   public:
     /** Initialize a `Maze` instance with `height` rows, `width` columns.
      *
-     * External walls are always present.
-     *
      * `height` and `width` must both be greater than 0.
      *
-     * The resulting instance has no internal walls. */
+     * The resulting instance has all internal walls passable. */
     Maze(int width, int height);
 
     /** Get the number of columns. */
@@ -23,74 +37,56 @@ class Maze {
     /** Get the number of rows. */
     [[nodiscard]] int height() const noexcept { return m_height; }
 
-    /** Return true if `position` is within the bounds of this maze. */
-    [[nodiscard]] bool contains_position(Position position) const noexcept;
+    /** Return true if `cell` is within the bounds of this maze. */
+    [[nodiscard]] bool contains(const Cell& cell) const noexcept;
+    /** Return true if `wall` is a boundary or internal wall. */
+    [[nodiscard]] bool contains(const Wall& wall) const noexcept;
 
-    /** Return the positions contained within the maze.
+    /** Return true if the wall is on the boundary of the maze. */
+    [[nodiscard]] bool is_boundary(const Wall& wall) const noexcept;
+    /** Return true if the wall is within, but not on, the boundary of the maze. */
+    [[nodiscard]] bool is_internal(const Wall& wall) const noexcept;
+
+    /** Return all of the cells contained within the bounds of the maze.
      *
-     * The behaviour if the maze changes size is undefined.
-     * */
-    [[nodiscard]] std::generator<Position> positions() const noexcept;
-
-    /** Return true if the wall is on the boundary of the maze.
+     * Each cell is returned exactly once, in an unspecified order. */
+    [[nodiscard]] std::generator<const Cell&> cells() const noexcept;
+    /** Return all of the boundary and internal walls of the maze.
      *
-     * The maze must contain `position`.
-     * */
-    [[nodiscard]] bool is_external_wall(Position position, Direction direction) const;
+     * Each wall is returned exactly once, in an unspecified order. */
+    [[nodiscard]] std::generator<const Wall&> walls() const noexcept;
 
-    /** Return true if the wall is within the boundary of the maze.
+    /** Return true if the wall is set.
      *
-     * The maze must contain `position`.
-     * */
-    [[nodiscard]] bool is_internal_wall(Position position, Direction direction) const {
-        return !is_external_wall(position, direction);
-    }
+     * External walls are always unset, and boundary walls are always set. */
+    [[nodiscard]] bool is_set(const Wall& wall) const noexcept;
 
-    /** Return true if there is a wall in `direction` from `position`.
+    /** Make `wall` impassable.
      *
-     * The maze must contain `position`.
-     * */
-    [[nodiscard]] bool has_wall(Position position, Direction direction) const;
-
-    /** Place the wall in `direction` from `position`, if it is absent.
+     * `wall` must be an internal wall. */
+    void set(const Wall& wall);
+    /** Make `wall` passable.
      *
-     * The maze must contain `position` and the wall must be internal.
-     * */
-    void place_wall(Position position, Direction direction) { set_wall(position, direction, true); }
-
-    /** Remove the wall in `direction` from `position`, if it is present.
+     * `wall` must be an internal wall. */
+    void unset(const Wall& wall);
+    /** Make `wall` passable if it was impassable, and vice versa.
      *
-     * The maze must contain `position` and the wall must be internal.
-     * */
-    void remove_wall(Position position, Direction direction) { set_wall(position, direction, false); }
+     * `wall` must be an internal wall. */
+    void toggle(const Wall& wall);
 
-    /** Toggle the state of the wall in `direction` from `position`.
-     *
-     * The maze must contain `position` and the wall must be internal.
-     * */
-    void toggle_wall(Position position, Direction direction) {
-        set_wall(position, direction, !has_wall(position, direction));
-    }
+    /** Make all internal walls impassable. */
+    void set_all() noexcept { m_internalWalls.set(); }
+    /** Return true if all internal walls are impassable. */
+    [[nodiscard]] bool all_set() const noexcept { return m_internalWalls.all(); }
 
-    /** Remove all internal walls. */
-    void clear() noexcept { m_internalWalls.reset(); }
-
-    /** Return true if the maze has no internal walls. */
-    [[nodiscard]] bool is_empty() const noexcept { return m_internalWalls.none(); }
-
-    /** Place all internal walls. */
-    void fill() noexcept { m_internalWalls.set(); }
-
-    /** Return true if the maze has all internal walls present. */
-    [[nodiscard]] bool is_full() const noexcept { return m_internalWalls.all(); }
+    /** Make all internal walls passable. */
+    void unset_all() noexcept { m_internalWalls.reset(); }
+    /** Return true if all internal walls are passable. */
+    [[nodiscard]] bool all_unset() const noexcept { return m_internalWalls.none(); }
 
   private:
     int m_width;
     int m_height;
     boost::dynamic_bitset<> m_internalWalls;
-
-    [[nodiscard]] int get_wall_index(Position position, Direction direction) const;
-
-    void set_wall(Position position, Direction direction, bool state);
 };
 } // namespace GridMazes
