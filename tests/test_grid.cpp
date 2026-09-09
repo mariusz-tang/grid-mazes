@@ -1,6 +1,7 @@
 #include "gridmazes/grid.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <utility>
 
 using namespace GridMazes;
 using enum Direction;
@@ -46,4 +47,11 @@ TEST_CASE("cell wall", "[grid]") {
 TEST_CASE("cell same wall from opposite sides", "[grid]") {
     REQUIRE(Cell { 0, 0 }.wall(up) == Cell { 0, -1 }.wall(down));
     REQUIRE(Cell { 3, 2 }.wall(left) == Cell { 2, 2 }.wall(right));
+}
+
+TEST_CASE("wall cells", "[grid]") {
+    REQUIRE(Wall { 0, 0, horizontal }.cells() == std::pair { Cell { 0, -1 }, Cell { 0, 0 } });
+    REQUIRE(Wall { 0, 0, vertical }.cells() == std::pair { Cell { -1, 0 }, Cell { 0, 0 } });
+    REQUIRE(Wall { 3, 2, horizontal }.cells() == std::pair { Cell { 2, 2 }, Cell { 2, 3 } });
+    REQUIRE(Wall { 5, 9, vertical }.cells() == std::pair { Cell { 4, 9 }, Cell { 5, 9 } });
 }

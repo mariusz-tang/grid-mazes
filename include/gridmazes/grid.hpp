@@ -2,6 +2,7 @@
 #include <boost/container_hash/hash.hpp>
 #include <cstddef>
 #include <functional>
+#include <utility>
 
 namespace GridMazes {
 /** Represents an orthogonal direction. */
@@ -29,6 +30,8 @@ inline constexpr std::array directions { Direction::up, Direction::down, Directi
 /** Represents an orientation: horizontal or vertical. */
 enum class Orientation : bool { horizontal, vertical };
 
+struct Cell;
+
 /** Represents a wall position in a 2D integer grid; that is, the spaces *between* cells.
  *
  * A wall position is defined by a "line", "offset" along that line, and an "orientation".
@@ -53,6 +56,11 @@ struct Wall {
     Orientation orientation { Orientation::horizontal };
 
     [[nodiscard]] constexpr friend bool operator==(const Wall& lhs, const Wall& rhs) noexcept = default;
+
+    /** Return the two cells separated by this wall.
+     *
+     * The cell which is left/up from the wall is the first one in the pair. */
+    [[nodiscard]] constexpr std::pair<Cell, Cell> cells() const noexcept;
 };
 
 /** Represents a cell position in a 2D integer grid. */
@@ -97,6 +105,15 @@ struct Cell {
         throw std::runtime_error { "invalid direction" };
     }
 };
+
+constexpr std::pair<Cell, Cell> Wall::cells() const noexcept {
+    switch (orientation) {
+    case Orientation::horizontal:
+        return { { .x = offset, .y = line - 1 }, { .x = offset, .y = line } };
+    case Orientation::vertical:
+        return { { .x = line - 1, .y = offset }, { .x = line, .y = offset } };
+    }
+}
 } // namespace GridMazes
 
 template <>
