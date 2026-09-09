@@ -117,7 +117,7 @@ namespace {
 /** Throw an exception if `wall` cannot be set/unset in `maze`. */
 void throw_if_immutable(const Maze& maze, const Wall& wall) {
     if (!maze.is_internal(wall)) {
-        throw std::runtime_error("tried to set or unset an internal wall");
+        throw std::runtime_error("tried to set or unset a non-internal wall");
     }
 }
 } // namespace
