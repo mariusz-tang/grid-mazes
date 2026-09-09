@@ -10,15 +10,15 @@ FetchContent_MakeAvailable(Catch2)
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 
 # Add tests.
-add_executable(Tests)
+add_executable(tests)
 target_sources(
-    Tests
+    tests
     PRIVATE test_grid.cpp test_maze.cpp renderers/test_text.cpp
 )
-target_link_libraries(Tests PRIVATE Catch2::Catch2WithMain GridMazes)
-target_compile_features(Tests PRIVATE cxx_std_23)
+target_link_libraries(tests PRIVATE Catch2::Catch2WithMain gridmazes)
+target_compile_features(tests PRIVATE cxx_std_23)
 
 # Register tests.
 include(CTest)
 include(Catch)
-catch_discover_tests(Tests)
+catch_discover_tests(tests)

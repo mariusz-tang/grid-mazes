@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.31...4.4)
 project(
-    GridMazes
+    gridmazes
     VERSION 0.0
     DESCRIPTION "Playground for 2D grid mazes"
     LANGUAGES CXX
@@ -10,9 +10,9 @@ project(
 find_package(Boost REQUIRED)
 
 # Targets.
-add_library(GridMazes)
+add_library(gridmazes)
 target_sources(
-    GridMazes
+    gridmazes
     PRIVATE src/maze.cpp src/renderers/text.cpp
     PUBLIC
         FILE_SET HEADERS
@@ -22,19 +22,19 @@ target_sources(
                 include/gridmazes/maze.hpp
                 include/gridmazes/renderers/text.hpp
 )
-target_link_libraries(GridMazes PUBLIC Boost::headers)
-target_compile_features(GridMazes PRIVATE cxx_std_23)
+target_link_libraries(gridmazes PUBLIC Boost::headers)
+target_compile_features(gridmazes PRIVATE cxx_std_23)
 
 if(
     (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 )
-    target_compile_options(GridMazes PRIVATE -Wall -Wpedantic)
+    target_compile_options(gridmazes PRIVATE -Wall -Wpedantic)
 elseif(
     (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     OR (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
 )
-    target_compile_options(GridMazes PRIVATE /Wall)
+    target_compile_options(gridmazes PRIVATE /Wall)
 endif()
 
 # Tests.
