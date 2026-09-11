@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-namespace GridMazes::Generators {
+namespace GridMazes {
 
 namespace {
 using CellGroup = std::unordered_set<Cell>;
@@ -102,4 +102,4 @@ Maze kruskal(Maze& maze, const std::vector<Wall>& orderedWalls) {
     return maze;
 }
 } // namespace Private
-} // namespace GridMazes::Generators
+} // namespace GridMazes

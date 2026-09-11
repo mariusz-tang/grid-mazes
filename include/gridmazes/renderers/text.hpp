@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace GridMazes::Render {
+namespace GridMazes {
 /** Return a string representing an image of a maze.
  *
  * For example, given a 3x4 maze, the result could be:
@@ -19,4 +19,4 @@ namespace GridMazes::Render {
  *
  * Newlines are placed inside the string but not at the end. */
 [[nodiscard]] std::string to_text(const Maze& maze);
-} // namespace GridMazes::Render
+} // namespace GridMazes

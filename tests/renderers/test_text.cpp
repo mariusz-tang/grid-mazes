@@ -12,7 +12,7 @@ TEST_CASE("to_text 1x1 maze", "[to_text]") {
                                             "X X\n"
                                             "XXX";
     const Maze maze { 1, 1 };
-    REQUIRE(Render::to_text(maze) == expectedResult);
+    REQUIRE(to_text(maze) == expectedResult);
 }
 
 TEST_CASE("to_text 3x1 empty maze", "[to_text]") {
@@ -20,7 +20,7 @@ TEST_CASE("to_text 3x1 empty maze", "[to_text]") {
                                             "X     X\n"
                                             "XXXXXXX";
     const Maze maze { 3, 1 };
-    REQUIRE(Render::to_text(maze) == expectedResult);
+    REQUIRE(to_text(maze) == expectedResult);
 }
 
 TEST_CASE("to_text 1x3 empty maze", "[to_text]") {
@@ -32,7 +32,7 @@ TEST_CASE("to_text 1x3 empty maze", "[to_text]") {
                                             "X X\n"
                                             "XXX";
     const Maze maze { 1, 3 };
-    REQUIRE(Render::to_text(maze) == expectedResult);
+    REQUIRE(to_text(maze) == expectedResult);
 }
 
 TEST_CASE("to_text 3x4 empty maze", "[to_text]") {
@@ -46,7 +46,7 @@ TEST_CASE("to_text 3x4 empty maze", "[to_text]") {
                                                 "X     X\n"
                                                 "XXXXXXX";
     const Maze maze { 3, 4 };
-    REQUIRE(Render::to_text(maze) == expectedResult);
+    REQUIRE(to_text(maze) == expectedResult);
 }
 
 TEST_CASE("to_text non-empty maze", "[to_text]") {
@@ -76,5 +76,5 @@ TEST_CASE("to_text non-empty maze", "[to_text]") {
     maze.set(Cell { .x = 3, .y = 2 }.wall(right));
     maze.set(Cell { .x = 0, .y = 2 }.wall(down));
     maze.set(Cell { .x = 3, .y = 2 }.wall(down));
-    REQUIRE(Render::to_text(maze) == expectedResult);
+    REQUIRE(to_text(maze) == expectedResult);
 }

@@ -7,7 +7,7 @@
 #include <cstddef>
 #include <string>
 
-namespace GridMazes::Render {
+namespace GridMazes {
 namespace {
 constexpr char wallMarker = 'X';
 constexpr char emptyMarker = ' ';
@@ -91,4 +91,4 @@ std::string to_text(const Maze& maze) {
     }
     return result;
 }
-} // namespace GridMazes::Render
+} // namespace GridMazes

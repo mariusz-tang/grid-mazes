@@ -8,7 +8,7 @@
 #include <generator>
 #include <vector>
 
-namespace GridMazes::Generators {
+namespace GridMazes {
 namespace Private {
 [[nodiscard]] std::generator<const Maze&> kruskal_steps(Maze maze, std::vector<Wall> orderedWalls);
 [[nodiscard]] Maze kruskal(Maze& maze, const std::vector<Wall>& orderedWalls);
@@ -35,4 +35,4 @@ template <typename RNG>
     std::ranges::shuffle(walls, std::forward<RNG>(rng));
     return Private::kruskal(maze, walls);
 }
-} // namespace GridMazes::Generators
+} // namespace GridMazes
