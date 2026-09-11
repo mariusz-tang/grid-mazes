@@ -8,6 +8,7 @@
 
 using namespace GridMazes;
 using enum Direction;
+using enum Orientation;
 
 TEST_CASE("maze constructor accepts positive width and height", "[maze]") {
     REQUIRE_NOTHROW(Maze { 1, 1 });
@@ -205,6 +206,19 @@ TEST_CASE("maze setters", "[maze]") {
             REQUIRE_FALSE(maze.is_set(wall));
         }
     }
+
+    SECTION("throw when trying to modify a non-internal wall") {
+        const Wall boundaryWall { .line = 0, .offset = 0, .orientation = horizontal };
+        REQUIRE_THROWS(maze.set(boundaryWall));
+        REQUIRE_THROWS(maze.unset(boundaryWall));
+        REQUIRE_THROWS(maze.toggle(boundaryWall));
+
+        const Wall externalWall { .line = 0, .offset = -1, .orientation = horizontal };
+        REQUIRE_THROWS(maze.set(externalWall));
+        REQUIRE_THROWS(maze.unset(externalWall));
+        REQUIRE_THROWS(maze.toggle(externalWall));
+    }
+
     SECTION("walls do not affect each other") {
         const Wall myWall { Cell { .x = 0, .y = 0 }.wall(right) };
         maze.set(myWall);
