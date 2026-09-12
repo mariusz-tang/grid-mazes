@@ -5,7 +5,11 @@
 
 #include <cassert>
 #include <cstddef>
+#include <format>
+#include <optional>
+#include <regex>
 #include <string>
+#include <string_view>
 
 namespace GridMazes {
 namespace {
@@ -91,4 +95,36 @@ std::string to_text(const Maze& maze) {
     }
     return result;
 }
+
+namespace {
+/** Return true if `text` is a valid text representation of a maze of dimensions `width` by `height`. */
+[[nodiscard]] bool is_valid(std::string_view text, int width, int height) {
+    const int frameWidth { frame_width(width) };
+
+    const std::string boundaryRegex { std::format("X{{{}}}", frameWidth) };
+    const std::string evenRowRegex { std::format("X( (X| )){{{}}} X", width - 1) };
+    const std::string oddRowRegex { std::format("X((X| )X){{{}}}", width) };
+    const std::regex regex { std::format("{0}\n({1}\n{2}\n){{{3}}}{1}\n{0}", boundaryRegex, evenRowRegex, oddRowRegex,
+                                         height - 1) };
+
+    return std::regex_match(text.cbegin(), text.cend(), regex);
+}
+} // namespace
+
+std::optional<Maze> parse_text(std::string_view text, int width, int height) {
+    if (!is_valid(text, width, height)) {
+        return {};
+    }
+
+    Maze result { width, height };
+    const int frameWidth { frame_width(width) };
+    // Set every wall which is present.
+    for (const auto& wall : result.internal_walls()) {
+        if (text[get_index(frameWidth, wall)] == wallMarker) {
+            result.set(wall);
+        }
+    }
+    return result;
+}
+
 } // namespace GridMazes

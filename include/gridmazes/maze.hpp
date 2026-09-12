@@ -32,6 +32,8 @@ class Maze {
      * The resulting instance has all internal walls passable. */
     Maze(int width, int height);
 
+    [[nodiscard]] constexpr bool operator==(const Maze&) const noexcept = default;
+
     /** Get the number of columns. */
     [[nodiscard]] int width() const noexcept { return m_width; }
 
