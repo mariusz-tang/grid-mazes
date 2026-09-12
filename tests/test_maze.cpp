@@ -2,6 +2,7 @@
 #include "gridmazes/maze.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <format>
 #include <iterator>
 #include <ranges>
 #include <unordered_set>
