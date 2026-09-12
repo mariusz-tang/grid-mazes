@@ -55,7 +55,7 @@ struct Wall {
     /** Which way the wall is facing. */
     Orientation orientation { Orientation::horizontal };
 
-    [[nodiscard]] constexpr friend bool operator==(Wall lhs, Wall rhs) noexcept = default;
+    [[nodiscard]] constexpr bool operator==(this Wall, Wall) noexcept = default;
 
     /** Return the two cells separated by this wall.
      *
@@ -70,7 +70,7 @@ struct Cell {
     /** Row. */
     int y { 0 };
 
-    [[nodiscard]] constexpr friend bool operator==(Cell lhs, Cell rhs) noexcept = default;
+    [[nodiscard]] constexpr bool operator==(this Cell, Cell) noexcept = default;
 
     /** Return the cell `distance` away in `direction` from this one. */
     [[nodiscard]] constexpr Cell translated(Direction direction, int distance = 1) const {
