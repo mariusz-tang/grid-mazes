@@ -9,35 +9,35 @@ using namespace GridMazes;
 using enum Direction;
 
 TEST_CASE("to_text 1x1 maze", "[text]") {
-    const std::string_view expectedResult = "XXX\n"
+    const std::string_view expectedResult { "XXX\n"
                                             "X X\n"
-                                            "XXX";
+                                            "XXX" };
     const Maze maze { 1, 1 };
     REQUIRE(to_text(maze) == expectedResult);
 }
 
 TEST_CASE("to_text 3x1 empty maze", "[text]") {
-    const std::string_view expectedResult = "XXXXXXX\n"
+    const std::string_view expectedResult { "XXXXXXX\n"
                                             "X     X\n"
-                                            "XXXXXXX";
+                                            "XXXXXXX" };
     const Maze maze { 3, 1 };
     REQUIRE(to_text(maze) == expectedResult);
 }
 
 TEST_CASE("to_text 1x3 empty maze", "[text]") {
-    const std::string_view expectedResult = "XXX\n"
+    const std::string_view expectedResult { "XXX\n"
                                             "X X\n"
                                             "X X\n"
                                             "X X\n"
                                             "X X\n"
                                             "X X\n"
-                                            "XXX";
+                                            "XXX" };
     const Maze maze { 1, 3 };
     REQUIRE(to_text(maze) == expectedResult);
 }
 
 TEST_CASE("to_text 3x4 empty maze", "[text]") {
-    constexpr std::string_view expectedResult = "XXXXXXX\n"
+    constexpr std::string_view expectedResult { "XXXXXXX\n"
                                                 "X     X\n"
                                                 "X X X X\n"
                                                 "X     X\n"
@@ -45,13 +45,13 @@ TEST_CASE("to_text 3x4 empty maze", "[text]") {
                                                 "X     X\n"
                                                 "X X X X\n"
                                                 "X     X\n"
-                                                "XXXXXXX";
+                                                "XXXXXXX" };
     const Maze maze { 3, 4 };
     REQUIRE(to_text(maze) == expectedResult);
 }
 
 TEST_CASE("to_text non-empty maze", "[text]") {
-    constexpr std::string_view expectedResult = "XXXXXXXXXXX\n"
+    constexpr std::string_view expectedResult { "XXXXXXXXXXX\n"
                                                 "X     X   X\n"
                                                 "XXXXX X XXX\n"
                                                 "X   X X   X\n"
@@ -59,7 +59,7 @@ TEST_CASE("to_text non-empty maze", "[text]") {
                                                 "X   X   X X\n"
                                                 "XXX X XXX X\n"
                                                 "X         X\n"
-                                                "XXXXXXXXXXX";
+                                                "XXXXXXXXXXX" };
     const auto width { 5 };
     const auto height { 4 };
     Maze maze { width, height };
