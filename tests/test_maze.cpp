@@ -314,3 +314,8 @@ TEST_CASE("setting all walls makes the maze full", "[maze]") {
     maze.set_all();
     REQUIRE(maze.all_set());
 }
+
+TEST_CASE("maze formatter", "[maze]") {
+    const Maze maze { 40, 2 };
+    REQUIRE(std::format("{}", maze) == "maze of width 40 and height 2");
+}

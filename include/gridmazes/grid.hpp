@@ -136,3 +136,58 @@ struct std::hash<GridMazes::Wall> {
         return seed;
     }
 };
+
+template <>
+struct std::formatter<GridMazes::Orientation> : std::formatter<std::string> {
+    auto format(GridMazes::Orientation orientation, format_context& ctx) const {
+        using enum GridMazes::Orientation;
+        switch (orientation) {
+        case horizontal:
+            return formatter<string>::format(std::format("horizontal"), ctx);
+        case vertical:
+            return formatter<string>::format(std::format("vertical"), ctx);
+        }
+    }
+};
+
+template <>
+struct std::formatter<GridMazes::Direction> : std::formatter<std::string> {
+    auto format(GridMazes::Direction direction, format_context& ctx) const {
+        using enum GridMazes::Direction;
+        switch (direction) {
+        case up:
+            return formatter<string>::format(std::format("up"), ctx);
+        case down:
+            return formatter<string>::format(std::format("down"), ctx);
+        case left:
+            return formatter<string>::format(std::format("left"), ctx);
+        case right:
+            return formatter<string>::format(std::format("right"), ctx);
+        default:
+            return formatter<string>::format(std::format("unknown[{}]", std::to_underlying(direction)), ctx);
+        }
+    }
+};
+
+template <>
+struct std::formatter<GridMazes::Wall> : std::formatter<std::string> {
+    auto format(GridMazes::Wall wall, format_context& ctx) const {
+        return formatter<string>::format(std::format("[{}, {}, {}]", wall.line, wall.offset, wall.orientation), ctx);
+    }
+};
+
+template <>
+struct std::formatter<GridMazes::Cell> : std::formatter<std::string> {
+    auto format(GridMazes::Cell cell, format_context& ctx) const {
+        return formatter<string>::format(std::format("[{}, {}]", cell.x, cell.y), ctx);
+    }
+};
+
+inline std::ostream& operator<<(std::ostream& os, GridMazes::Direction direction) {
+    return os << std::format("{}", direction);
+}
+inline std::ostream& operator<<(std::ostream& os, GridMazes::Orientation orientation) {
+    return os << std::format("{}", orientation);
+}
+inline std::ostream& operator<<(std::ostream& os, GridMazes::Wall wall) { return os << std::format("{}", wall); }
+inline std::ostream& operator<<(std::ostream& os, GridMazes::Cell cell) { return os << std::format("{}", cell); }

@@ -2,6 +2,7 @@
 #include "gridmazes/grid.hpp"
 
 #include <boost/dynamic_bitset/dynamic_bitset.hpp>
+#include <format>
 #include <generator>
 
 namespace GridMazes {
@@ -98,3 +99,13 @@ class Maze {
     boost::dynamic_bitset<> m_internalWalls;
 };
 } // namespace GridMazes
+
+template <>
+struct std::formatter<GridMazes::Maze> : std::formatter<std::string> {
+    auto format(const GridMazes::Maze& maze, format_context& ctx) const {
+        return formatter<string>::format(std::format("maze of width {} and height {}", maze.width(), maze.height()),
+                                         ctx);
+    }
+};
+
+inline std::ostream& operator<<(std::ostream& os, const GridMazes::Maze& maze) { return os << std::format("{}", maze); }

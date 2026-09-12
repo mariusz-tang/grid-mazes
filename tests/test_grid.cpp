@@ -1,6 +1,7 @@
 #include "gridmazes/grid.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <format>
 #include <utility>
 
 using namespace GridMazes;
@@ -55,3 +56,19 @@ TEST_CASE("wall cells", "[grid]") {
     REQUIRE(Wall { 3, 2, horizontal }.cells() == std::pair { Cell { 2, 2 }, Cell { 2, 3 } });
     REQUIRE(Wall { 5, 9, vertical }.cells() == std::pair { Cell { 4, 9 }, Cell { 5, 9 } });
 }
+
+TEST_CASE("direction formatter", "[grid]") {
+    REQUIRE(std::format("{}", up) == "up");
+    REQUIRE(std::format("{}", down) == "down");
+    REQUIRE(std::format("{}", left) == "left");
+    REQUIRE(std::format("{}", right) == "right");
+}
+
+TEST_CASE("orientation formatter", "[grid]") {
+    REQUIRE(std::format("{}", horizontal) == "horizontal");
+    REQUIRE(std::format("{}", vertical) == "vertical");
+}
+
+TEST_CASE("wall formatter", "[grid]") { REQUIRE(std::format("{}", Wall { 0, 4, horizontal }) == "[0, 4, horizontal]"); }
+
+TEST_CASE("cell formatter", "[grid]") { REQUIRE(std::format("{}", Cell { 39, 2 }) == "[39, 2]"); }
