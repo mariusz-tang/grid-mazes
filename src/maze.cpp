@@ -25,13 +25,13 @@ Maze::Maze(int width, int height)
     }
 }
 
-bool Maze::contains(const Cell& cell) const noexcept {
+bool Maze::contains(Cell cell) const noexcept {
     const bool has_column { 0 <= cell.x && cell.x < m_width };
     const bool has_row { 0 <= cell.y && cell.y < m_height };
     return has_column && has_row;
 }
 
-bool Maze::contains(const Wall& wall) const noexcept {
+bool Maze::contains(Wall wall) const noexcept {
     int max_line {};
     int max_offset {};
 
@@ -50,7 +50,7 @@ bool Maze::contains(const Wall& wall) const noexcept {
     return has_line && has_offset;
 }
 
-bool Maze::is_boundary(const Wall& wall) const noexcept {
+bool Maze::is_boundary(Wall wall) const noexcept {
     if (!contains(wall)) {
         return false;
     }
@@ -63,9 +63,9 @@ bool Maze::is_boundary(const Wall& wall) const noexcept {
     }
 }
 
-bool Maze::is_internal(const Wall& wall) const noexcept { return contains(wall) && !is_boundary(wall); }
+bool Maze::is_internal(Wall wall) const noexcept { return contains(wall) && !is_boundary(wall); }
 
-std::generator<const Cell&> Maze::cells() const noexcept {
+std::generator<Cell> Maze::cells() const noexcept {
     for (int column { 0 }; column < m_width; column++) {
         for (int row { 0 }; row < m_height; row++) {
             co_yield { .x = column, .y = row };
@@ -73,7 +73,7 @@ std::generator<const Cell&> Maze::cells() const noexcept {
     }
 }
 
-std::generator<const Wall&> Maze::walls() const noexcept {
+std::generator<Wall> Maze::walls() const noexcept {
     for (int line { 0 }; line <= m_height; line++) {
         for (int offset { 0 }; offset < m_width; offset++) {
             co_yield { .line = line, .offset = offset, .orientation = Orientation::horizontal };
@@ -86,7 +86,7 @@ std::generator<const Wall&> Maze::walls() const noexcept {
     }
 }
 
-std::generator<const Wall&> Maze::internal_walls() const noexcept {
+std::generator<Wall> Maze::internal_walls() const noexcept {
     for (const auto& wall : walls()) {
         if (is_internal(wall)) {
             co_yield wall;
@@ -94,7 +94,7 @@ std::generator<const Wall&> Maze::internal_walls() const noexcept {
     }
 }
 
-std::generator<const Wall&> Maze::boundary_walls() const noexcept {
+std::generator<Wall> Maze::boundary_walls() const noexcept {
     for (const auto& wall : walls()) {
         if (is_boundary(wall)) {
             co_yield wall;
@@ -104,7 +104,7 @@ std::generator<const Wall&> Maze::boundary_walls() const noexcept {
 
 namespace {
 /** Get the unique index of an internal wall in a maze. */
-[[nodiscard]] int get_internal_wall_index(const Maze& maze, const Wall& wall) {
+[[nodiscard]] int get_internal_wall_index(const Maze& maze, Wall wall) {
     assert(maze.is_internal(wall));
 
     switch (wall.orientation) {
@@ -119,7 +119,7 @@ namespace {
 }
 } // namespace
 
-[[nodiscard]] bool Maze::is_set(const Wall& wall) const noexcept {
+[[nodiscard]] bool Maze::is_set(Wall wall) const noexcept {
     if (!contains(wall)) {
         return false;
     }
@@ -131,24 +131,24 @@ namespace {
 
 namespace {
 /** Throw an exception if `wall` cannot be set/unset in `maze`. */
-void throw_if_immutable(const Maze& maze, const Wall& wall) {
+void throw_if_immutable(const Maze& maze, Wall wall) {
     if (!maze.is_internal(wall)) {
         throw std::runtime_error("tried to set or unset a non-internal wall");
     }
 }
 } // namespace
 
-void Maze::set(const Wall& wall) {
+void Maze::set(Wall wall) {
     throw_if_immutable(*this, wall);
     m_internalWalls[get_internal_wall_index(*this, wall)] = true;
 }
 
-void Maze::unset(const Wall& wall) {
+void Maze::unset(Wall wall) {
     throw_if_immutable(*this, wall);
     m_internalWalls[get_internal_wall_index(*this, wall)] = false;
 }
 
-void Maze::toggle(const Wall& wall) {
+void Maze::toggle(Wall wall) {
     throw_if_immutable(*this, wall);
     if (is_set(wall)) {
         unset(wall);

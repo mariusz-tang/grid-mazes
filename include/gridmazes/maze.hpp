@@ -39,49 +39,49 @@ class Maze {
     [[nodiscard]] int height() const noexcept { return m_height; }
 
     /** Return true if `cell` is within the bounds of this maze. */
-    [[nodiscard]] bool contains(const Cell& cell) const noexcept;
+    [[nodiscard]] bool contains(Cell cell) const noexcept;
     /** Return true if `wall` is a boundary or internal wall. */
-    [[nodiscard]] bool contains(const Wall& wall) const noexcept;
+    [[nodiscard]] bool contains(Wall wall) const noexcept;
 
     /** Return true if the wall is on the boundary of the maze. */
-    [[nodiscard]] bool is_boundary(const Wall& wall) const noexcept;
+    [[nodiscard]] bool is_boundary(Wall wall) const noexcept;
     /** Return true if the wall is within, but not on, the boundary of the maze. */
-    [[nodiscard]] bool is_internal(const Wall& wall) const noexcept;
+    [[nodiscard]] bool is_internal(Wall wall) const noexcept;
 
     /** Return all of the cells contained within the bounds of the maze.
      *
      * Each cell is returned exactly once, in an unspecified order. */
-    [[nodiscard]] std::generator<const Cell&> cells() const noexcept;
+    [[nodiscard]] std::generator<Cell> cells() const noexcept;
     /** Return all of the boundary and internal walls of the maze.
      *
      * Each wall is returned exactly once, in an unspecified order. */
-    [[nodiscard]] std::generator<const Wall&> walls() const noexcept;
+    [[nodiscard]] std::generator<Wall> walls() const noexcept;
     /** Return all of the internal walls of the maze.
      *
      * Each wall is returned exactly once, in an unspecified order. */
-    [[nodiscard]] std::generator<const Wall&> internal_walls() const noexcept;
+    [[nodiscard]] std::generator<Wall> internal_walls() const noexcept;
     /** Return all of the boundary walls of the maze.
      *
      * Each wall is returned exactly once, in an unspecified order. */
-    [[nodiscard]] std::generator<const Wall&> boundary_walls() const noexcept;
+    [[nodiscard]] std::generator<Wall> boundary_walls() const noexcept;
 
     /** Return true if the wall is set.
      *
      * External walls are always unset, and boundary walls are always set. */
-    [[nodiscard]] bool is_set(const Wall& wall) const noexcept;
+    [[nodiscard]] bool is_set(Wall wall) const noexcept;
 
     /** Make `wall` impassable.
      *
      * `wall` must be an internal wall. */
-    void set(const Wall& wall);
+    void set(Wall wall);
     /** Make `wall` passable.
      *
      * `wall` must be an internal wall. */
-    void unset(const Wall& wall);
+    void unset(Wall wall);
     /** Make `wall` passable if it was impassable, and vice versa.
      *
      * `wall` must be an internal wall. */
-    void toggle(const Wall& wall);
+    void toggle(Wall wall);
 
     /** Make all internal walls impassable. */
     void set_all() noexcept { m_internalWalls.set(); }

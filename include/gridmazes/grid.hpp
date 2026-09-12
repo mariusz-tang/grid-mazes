@@ -55,7 +55,7 @@ struct Wall {
     /** Which way the wall is facing. */
     Orientation orientation { Orientation::horizontal };
 
-    [[nodiscard]] constexpr friend bool operator==(const Wall& lhs, const Wall& rhs) noexcept = default;
+    [[nodiscard]] constexpr friend bool operator==(Wall lhs, Wall rhs) noexcept = default;
 
     /** Return the two cells separated by this wall.
      *
@@ -70,7 +70,7 @@ struct Cell {
     /** Row. */
     int y { 0 };
 
-    [[nodiscard]] constexpr friend bool operator==(const Cell& lhs, const Cell& rhs) noexcept = default;
+    [[nodiscard]] constexpr friend bool operator==(Cell lhs, Cell rhs) noexcept = default;
 
     /** Return the cell `distance` away in `direction` from this one. */
     [[nodiscard]] constexpr Cell translated(Direction direction, int distance = 1) const {
@@ -118,7 +118,7 @@ constexpr std::pair<Cell, Cell> Wall::cells() const noexcept {
 
 template <>
 struct std::hash<GridMazes::Cell> {
-    std::size_t operator()(const GridMazes::Cell& cell) const noexcept {
+    std::size_t operator()(GridMazes::Cell cell) const noexcept {
         std::size_t seed { 0 };
         boost::hash_combine(seed, cell.x);
         boost::hash_combine(seed, cell.y);
@@ -128,7 +128,7 @@ struct std::hash<GridMazes::Cell> {
 
 template <>
 struct std::hash<GridMazes::Wall> {
-    std::size_t operator()(const GridMazes::Wall& wall) const noexcept {
+    std::size_t operator()(GridMazes::Wall wall) const noexcept {
         std::size_t seed { 0 };
         boost::hash_combine(seed, wall.line);
         boost::hash_combine(seed, wall.offset);

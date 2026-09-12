@@ -57,7 +57,7 @@ std::string make_frame(int width, int height) {
 }
 
 /** Return the index of the wall in a maze string with the given width. */
-std::size_t get_index(int frameWidth, const Wall& wall) {
+std::size_t get_index(int frameWidth, Wall wall) {
     // Every second row/column is a corner.
     int column {};
     int row {};
