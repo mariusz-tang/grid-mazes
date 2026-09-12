@@ -62,10 +62,7 @@ std::generator<const Maze&> kruskal_steps(Maze maze, std::vector<Wall> orderedWa
     co_yield maze;
 
     for (const auto& wall : orderedWalls) {
-        assert(maze.contains(wall));
-        if (maze.is_boundary(wall)) {
-            continue;
-        }
+        assert(maze.is_internal(wall));
 
         // If the wall separates two different groups...
         if (!in_same_group(groups_by_cell, wall.cells())) {
@@ -87,10 +84,7 @@ Maze kruskal(Maze& maze, const std::vector<Wall>& orderedWalls) {
     maze.set_all();
 
     for (const auto& wall : orderedWalls) {
-        assert(maze.contains(wall));
-        if (maze.is_boundary(wall)) {
-            continue;
-        }
+        assert(maze.is_internal(wall));
 
         // If the wall separates two different groups...
         if (!in_same_group(groups_by_cell, wall.cells())) {

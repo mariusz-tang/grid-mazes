@@ -84,8 +84,8 @@ std::string to_text(const Maze& maze) {
 
     // Insert walls where present.
     const auto frameWidth { frame_width(maze.width()) };
-    for (const auto& wall : maze.walls()) {
-        if (maze.is_internal(wall) && maze.is_set(wall)) {
+    for (const auto& wall : maze.internal_walls()) {
+        if (maze.is_set(wall)) {
             result[get_index(frameWidth, wall)] = wallMarker;
         }
     }

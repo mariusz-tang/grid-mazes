@@ -170,13 +170,43 @@ TEST_CASE("maze walls generator", "[maze]") {
     }
 }
 
+TEST_CASE("maze internal walls generator", "[maze]") {
+    const Maze maze { 4, 15 };
+    const int numWalls { 101 };
+    const std::unordered_set uniqueReturnedWalls(std::from_range, maze.internal_walls());
+    const long numUniqueReturnedWalls { static_cast<long>(uniqueReturnedWalls.size()) };
+    const long numReturnedWalls { std::ranges::distance(maze.internal_walls()) };
+
+    SECTION("returns as many internal walls as there are in the maze") { REQUIRE(numReturnedWalls == numWalls); }
+    SECTION("all walls are unique") { REQUIRE(numUniqueReturnedWalls == numReturnedWalls); }
+    SECTION("all walls are internal") {
+        for (const auto& wall : maze.internal_walls()) {
+            REQUIRE(maze.is_internal(wall));
+        }
+    }
+}
+
+TEST_CASE("maze boundary walls generator", "[maze]") {
+    const Maze maze { 4, 15 };
+    const int numWalls { 38 };
+    const std::unordered_set uniqueReturnedWalls(std::from_range, maze.boundary_walls());
+    const long numUniqueReturnedWalls { static_cast<long>(uniqueReturnedWalls.size()) };
+    const long numReturnedWalls { std::ranges::distance(maze.boundary_walls()) };
+
+    SECTION("returns as many boundary walls as there are in the maze") { REQUIRE(numReturnedWalls == numWalls); }
+    SECTION("all walls are unique") { REQUIRE(numUniqueReturnedWalls == numReturnedWalls); }
+    SECTION("all walls are boundary walls") {
+        for (const auto& wall : maze.boundary_walls()) {
+            REQUIRE(maze.is_boundary(wall));
+        }
+    }
+}
+
 TEST_CASE("maze is_set", "[maze]") {
     const Maze maze { 3, 2 };
     SECTION("boundary walls are set") {
-        for (const auto& wall : maze.walls()) {
-            if (maze.is_boundary(wall)) {
-                REQUIRE(maze.is_set(wall));
-            }
+        for (const auto& wall : maze.boundary_walls()) {
+            REQUIRE(maze.is_set(wall));
         }
     }
 
@@ -191,10 +221,7 @@ TEST_CASE("maze setters", "[maze]") {
     Maze maze { 3, 2 };
 
     SECTION("internal walls can be set, unset, and toggled") {
-        for (const auto& wall : maze.walls()) {
-            if (!maze.is_internal(wall)) {
-                continue;
-            }
+        for (const auto& wall : maze.internal_walls()) {
             REQUIRE_FALSE(maze.is_set(wall));
             maze.set(wall);
             REQUIRE(maze.is_set(wall));
@@ -224,8 +251,8 @@ TEST_CASE("maze setters", "[maze]") {
         maze.set(myWall);
         REQUIRE(maze.is_set(myWall));
 
-        for (const auto& wall : maze.walls()) {
-            if (maze.is_internal(wall) && wall != myWall) {
+        for (const auto& wall : maze.internal_walls()) {
+            if (wall != myWall) {
                 REQUIRE_FALSE(maze.is_set(wall));
             }
         }
@@ -235,16 +262,12 @@ TEST_CASE("maze setters", "[maze]") {
 TEST_CASE("maze set_all", "[maze]") {
     Maze maze { 15, 4 }; // NOLINT (magic numbers)
 
-    for (const auto& wall : maze.walls()) {
-        if (maze.is_internal(wall)) {
-            REQUIRE_FALSE(maze.is_set(wall));
-        }
+    for (const auto& wall : maze.internal_walls()) {
+        REQUIRE_FALSE(maze.is_set(wall));
     }
     maze.set_all();
-    for (const auto& wall : maze.walls()) {
-        if (maze.is_internal(wall)) {
-            REQUIRE(maze.is_set(wall));
-        }
+    for (const auto& wall : maze.internal_walls()) {
+        REQUIRE(maze.is_set(wall));
     }
 }
 
@@ -252,17 +275,13 @@ TEST_CASE("maze unset_all", "[maze]") {
     Maze maze { 15, 4 }; // NOLINT (magic numbers)
 
     maze.set_all();
-    for (const auto& wall : maze.walls()) {
-        if (maze.is_internal(wall)) {
-            REQUIRE(maze.is_set(wall));
-        }
+    for (const auto& wall : maze.internal_walls()) {
+        REQUIRE(maze.is_set(wall));
     }
 
     maze.unset_all();
-    for (const auto& wall : maze.walls()) {
-        if (maze.is_internal(wall)) {
-            REQUIRE_FALSE(maze.is_set(wall));
-        }
+    for (const auto& wall : maze.internal_walls()) {
+        REQUIRE_FALSE(maze.is_set(wall));
     }
 }
 

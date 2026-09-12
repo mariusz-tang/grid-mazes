@@ -55,6 +55,14 @@ class Maze {
      *
      * Each wall is returned exactly once, in an unspecified order. */
     [[nodiscard]] std::generator<const Wall&> walls() const noexcept;
+    /** Return all of the internal walls of the maze.
+     *
+     * Each wall is returned exactly once, in an unspecified order. */
+    [[nodiscard]] std::generator<const Wall&> internal_walls() const noexcept;
+    /** Return all of the boundary walls of the maze.
+     *
+     * Each wall is returned exactly once, in an unspecified order. */
+    [[nodiscard]] std::generator<const Wall&> boundary_walls() const noexcept;
 
     /** Return true if the wall is set.
      *

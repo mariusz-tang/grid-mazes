@@ -20,7 +20,7 @@ namespace Private {
 template <typename RNG>
 [[nodiscard]] std::generator<const Maze&> kruskal_steps(int width, int height, RNG&& rng) {
     Maze maze { width, height };
-    std::vector walls(std::from_range, maze.walls());
+    std::vector walls(std::from_range, maze.internal_walls());
     std::ranges::shuffle(walls, std::forward<RNG>(rng));
     return Private::kruskal_steps(std::move(maze), std::move(walls));
 }
@@ -31,7 +31,7 @@ template <typename RNG>
 template <typename RNG>
 [[nodiscard]] Maze kruskal(int width, int height, RNG&& rng) {
     Maze maze { width, height };
-    std::vector walls(std::from_range, maze.walls());
+    std::vector walls(std::from_range, maze.internal_walls());
     std::ranges::shuffle(walls, std::forward<RNG>(rng));
     return Private::kruskal(maze, walls);
 }

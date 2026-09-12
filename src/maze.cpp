@@ -86,6 +86,22 @@ std::generator<const Wall&> Maze::walls() const noexcept {
     }
 }
 
+std::generator<const Wall&> Maze::internal_walls() const noexcept {
+    for (const auto& wall : walls()) {
+        if (is_internal(wall)) {
+            co_yield wall;
+        }
+    }
+}
+
+std::generator<const Wall&> Maze::boundary_walls() const noexcept {
+    for (const auto& wall : walls()) {
+        if (is_boundary(wall)) {
+            co_yield wall;
+        }
+    }
+}
+
 namespace {
 /** Get the unique index of an internal wall in a maze. */
 [[nodiscard]] int get_internal_wall_index(const Maze& maze, const Wall& wall) {
