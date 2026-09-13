@@ -4,6 +4,7 @@
 #include <boost/dynamic_bitset/dynamic_bitset.hpp>
 #include <format>
 #include <generator>
+#include <utility>
 
 namespace GridMazes {
 
@@ -54,6 +55,11 @@ class Maze {
      *
      * Each cell is returned exactly once, in an unspecified order. */
     [[nodiscard]] std::generator<Cell> cells() const noexcept;
+    /** Return direction/neighbour pairs for each reachable cell adjancent to `cell`.
+     *
+     * A neighbour is "reachable" if the wall between it and `cell` is passable. */
+    [[nodiscard]] std::generator<std::pair<Cell, Direction>> neighbours(Cell cell) const;
+
     /** Return all of the boundary and internal walls of the maze.
      *
      * Each wall is returned exactly once, in an unspecified order. */

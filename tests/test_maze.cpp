@@ -1,11 +1,14 @@
 #include "gridmazes/grid.hpp"
 #include "gridmazes/maze.hpp"
+#include "gridmazes/renderers/text.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 #include <format>
 #include <iterator>
 #include <ranges>
 #include <unordered_set>
+#include <utility>
 
 using namespace GridMazes;
 using enum Direction;
@@ -152,6 +155,35 @@ TEST_CASE("maze cells generator", "[maze]") {
         for (const auto& cell : maze.cells()) {
             REQUIRE(maze.contains(cell));
         }
+    }
+}
+
+TEST_CASE("cell neighbours generator", "[maze]") {
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+    const Maze maze { parse_text("XXXXXXX\n"
+                                 "X X   X\n"
+                                 "XXX XXX\n"
+                                 "X     X\n"
+                                 "X X X X\n"
+                                 "X     X\n"
+                                 "XXXXXXX",
+                                 3, 3)
+                          .value() };
+    const auto& [cell, count] { GENERATE(std::make_pair(Cell { 0, 0 }, 0), std::make_pair(Cell { 2, 0 }, 1),
+                                         std::make_pair(Cell { 0, 2 }, 2), std::make_pair(Cell { 1, 2 }, 3),
+                                         std::make_pair(Cell { 1, 1 }, 4)) };
+
+    SECTION("returns once for each neighbour") { REQUIRE(std::ranges::distance(maze.neighbours(cell)) == count); }
+    SECTION("returns reachable neighbours only") {
+        for (const auto& [neighbour, direction] : maze.neighbours(cell)) {
+            REQUIRE_FALSE(maze.is_set(cell.wall(direction)));
+            REQUIRE(cell.translated(direction) == neighbour);
+        }
+    }
+    SECTION("all neighbours unique") {
+        auto cellsOnly { maze.neighbours(cell) |
+                         std::views::transform([](std::pair<Cell, Direction> pair) { return pair.first; }) };
+        REQUIRE(std::unordered_set(std::from_range, cellsOnly).size() == count);
     }
 }
 

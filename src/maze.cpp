@@ -7,6 +7,7 @@
 #include <format>
 #include <generator>
 #include <stdexcept>
+#include <utility>
 
 namespace GridMazes {
 using enum Direction;
@@ -69,6 +70,14 @@ std::generator<Cell> Maze::cells() const noexcept {
     for (int column { 0 }; column < m_width; column++) {
         for (int row { 0 }; row < m_height; row++) {
             co_yield { .x = column, .y = row };
+        }
+    }
+}
+
+std::generator<std::pair<Cell, Direction>> Maze::neighbours(Cell cell) const {
+    for (const auto& direction : directions) {
+        if (!is_set(cell.wall(direction))) {
+            co_yield { cell.translated(direction), direction };
         }
     }
 }
