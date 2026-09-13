@@ -2,6 +2,24 @@
 
 C++ library for generating and solving 2D grid mazes.
 
+## Goals
+
+This project is a work-in-progess. This is what is implemented so far:
+
+- Basic maze data structure.
+- Maze-to-text renderer.
+- Kruskal's algorithm maze generator.
+- Maze connectedness checker.
+
+Here are some planned features:
+
+- more maze generation algorithms.
+- maze solving algorithms.
+- Maze-to-image renderer.
+- CLI to showcase the algorithms.
+- GUI to showcase the algorithms plus interactive features like manual maze input.
+- Benchmarking.
+
 ## Dependencies
 
 - Boost (for dynamic bitsets and hashing utilities).
