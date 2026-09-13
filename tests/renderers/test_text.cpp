@@ -98,6 +98,28 @@ TEST_CASE("parse_text", "[text]") {
     REQUIRE(parse_text(input, 4, 3) == expectedResult);
 }
 
+TEST_CASE("parse_text edge cases", "[text]") {
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
+    REQUIRE(parse_text("XXX\n"
+                       "X X\n"
+                       "XXX",
+                       1, 1)
+                .value() == Maze { 1, 1 });
+    REQUIRE(parse_text("XXX\n"
+                       "X X\n"
+                       "X X\n"
+                       "X X\n"
+                       "XXX",
+                       1, 2)
+                .value() == Maze { 1, 2 });
+    REQUIRE(parse_text("XXXXXXX\n"
+                       "X     X\n"
+                       "XXXXXXX",
+                       3, 1)
+                .value() == Maze { 3, 1 });
+    // NOLINTEND(bugprone-unchecked-optional-access)
+}
+
 TEST_CASE("parse_text fails if input is not valid", "[text]") {
     SECTION("invalid wall") {
         REQUIRE_FALSE(parse_text("XXXXXXXXX\n"
