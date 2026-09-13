@@ -2,6 +2,7 @@ Checks: "*, -abseil-*, -altera-*, -android-*, -fuchsia-*, -google-*, -llvm*, -mo
 # Get rid of misc-static-assert because it keeps false positives.
 CheckOptions:
   readability-identifier-length.IgnoredParameterNames: '^os$'
+  readability-identifier-length.IgnoredVariableNames: '^_$'
   bugprone-easily-swappable-parameters.IgnoredParameterNames: 'width;height'
   # Prevent diving into Catch2 macros. We should be avoiding macros in our own code anyway.
   readability-function-cognitive-complexity.IgnoreMacros: true

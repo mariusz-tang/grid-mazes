@@ -13,7 +13,11 @@ list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 add_executable(tests)
 target_sources(
     tests
-    PRIVATE test_grid.cpp test_maze.cpp renderers/test_text.cpp
+    PRIVATE
+        test_grid.cpp
+        test_maze.cpp
+        properties/test_connected.cpp
+        renderers/test_text.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain gridmazes)
 target_compile_features(tests PRIVATE cxx_std_23)
