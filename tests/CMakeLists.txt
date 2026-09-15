@@ -17,6 +17,7 @@ target_sources(
         test_grid.cpp
         test_maze.cpp
         properties/test_connected.cpp
+        properties/test_tree.cpp
         renderers/test_text.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain gridmazes)

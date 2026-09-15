@@ -17,6 +17,7 @@ target_sources(
         src/maze.cpp
         src/generators/kruskal.cpp
         src/properties/connected.cpp
+        src/properties/tree.cpp
         src/renderers/text.cpp
     PUBLIC
         FILE_SET HEADERS
@@ -26,6 +27,7 @@ target_sources(
                 include/gridmazes/maze.hpp
                 include/gridmazes/generators/kruskal.hpp
                 include/gridmazes/properties/connected.hpp
+                include/gridmazes/properties/tree.hpp
                 include/gridmazes/renderers/text.hpp
 )
 target_link_libraries(gridmazes PUBLIC Boost::headers)
