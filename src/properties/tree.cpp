@@ -3,7 +3,6 @@
 #include "gridmazes/grid.hpp"
 #include "gridmazes/maze.hpp"
 
-#include <cstddef>
 #include <stack>
 #include <unordered_set>
 
@@ -42,6 +41,6 @@ bool is_tree(const Maze& maze) {
 
     // If there were no cycles then the maze is a tree if it is fully connected,
     // i.e. if we visited every cell.
-    return visitedCells.size() == (static_cast<std::size_t>(maze.width() * maze.height()));
+    return visitedCells.size() == maze.size();
 }
 } // namespace GridMazes

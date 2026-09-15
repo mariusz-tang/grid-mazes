@@ -2,6 +2,7 @@
 #include "gridmazes/grid.hpp"
 
 #include <boost/dynamic_bitset/dynamic_bitset.hpp>
+#include <cstddef>
 #include <format>
 #include <generator>
 #include <utility>
@@ -37,9 +38,10 @@ class Maze {
 
     /** Get the number of columns. */
     [[nodiscard]] int width() const noexcept { return m_width; }
-
     /** Get the number of rows. */
     [[nodiscard]] int height() const noexcept { return m_height; }
+    /** Get the number of cells in the maze */
+    [[nodiscard]] std::size_t size() const noexcept { return static_cast<std::size_t>(m_width) * m_height; }
 
     /** Return true if `cell` is within the bounds of this maze. */
     [[nodiscard]] bool contains(Cell cell) const noexcept;

@@ -31,10 +31,11 @@ TEST_CASE("maze constructor throws if either dimension is non-positive", "[maze]
     REQUIRE_THROWS(Maze { -1, -3 });
 }
 
-TEST_CASE("maze width and height", "[maze]") {
+TEST_CASE("maze basic properties", "[maze]") {
     const Maze maze { 4, 2 };
     REQUIRE(maze.width() == 4);
     REQUIRE(maze.height() == 2);
+    REQUIRE(maze.size() == 8);
 }
 
 TEST_CASE("maze contains cell", "[maze]") {

@@ -3,7 +3,6 @@
 #include "gridmazes/grid.hpp"
 #include "gridmazes/maze.hpp"
 
-#include <cstddef>
 #include <stack>
 #include <unordered_set>
 
@@ -35,9 +34,8 @@ namespace {
 
 bool is_connected(const Maze& maze) {
     // The maze is globally connected if every cell is connected to [0,0].
-    const auto numCells { static_cast<size_t>(maze.width() * maze.height()) };
-    const auto numConnectedCells { connected_cells(maze, Cell { .x = 0, .y = 0 }).size() };
-    return numConnectedCells == numCells;
+    const std::unordered_set connectedCells { connected_cells(maze, Cell { .x = 0, .y = 0 }) };
+    return connectedCells.size() == maze.size();
 }
 
 bool is_connected(const Maze& maze, Cell start, Cell finish) { return connected_cells(maze, start).contains(finish); }
