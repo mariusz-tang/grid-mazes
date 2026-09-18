@@ -90,38 +90,18 @@ bool contains(const Maze& maze, Cell cell) noexcept {
 }
 
 bool contains(const Maze& maze, Wall wall) noexcept {
-    int max_line {};
-    int max_offset {};
-
-    switch (wall.orientation) {
-    case Orientation::horizontal:
-        max_offset = maze.width() - 1;
-        max_line = maze.height();
-        break;
-    case Orientation::vertical:
-        max_offset = maze.height() - 1;
-        max_line = maze.width();
-        break;
-    }
-    const bool has_line { 0 <= wall.line && wall.line <= max_line };
-    const bool has_offset { 0 <= wall.offset && wall.offset <= max_offset };
-    return has_line && has_offset;
+    const auto& [first, second] { neighbours(wall) };
+    // A maze contains a wall if it contains either of the cells it divides.
+    return contains(maze, first) || contains(maze, second);
 }
 
-bool is_boundary(Wall wall, const Maze& maze) noexcept {
-    if (!contains(maze, wall)) {
-        return false;
-    }
+bool is_boundary(Wall wall, const Maze& maze) noexcept { return contains(maze, wall) && !is_internal(wall, maze); }
 
-    switch (wall.orientation) {
-    case Orientation::horizontal:
-        return wall.line == 0 || wall.line == maze.height();
-    case Orientation::vertical:
-        return wall.line == 0 || wall.line == maze.width();
-    }
+bool is_internal(Wall wall, const Maze& maze) noexcept {
+    const auto& [first, second] { neighbours(wall) };
+    // A wall is internal if the maze contains both of the cells it divides.
+    return contains(maze, first) && contains(maze, second);
 }
-
-bool is_internal(Wall wall, const Maze& maze) noexcept { return contains(maze, wall) && !is_boundary(wall, maze); }
 
 namespace {
 /** Return the cells of a maze with shape `width` by `height`. */
