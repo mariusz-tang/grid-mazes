@@ -76,7 +76,7 @@ struct Wall {
     int line { 0 };
     /** How far along the wall is along its line. */
     int offset { 0 };
-    /** Which way the wall is facing. */
+    /** Which way the wall runs. */
     Orientation orientation { Orientation::horizontal };
 
     [[nodiscard]] constexpr bool operator==(this Wall, Wall) noexcept = default;
