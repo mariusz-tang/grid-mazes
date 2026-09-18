@@ -40,121 +40,121 @@ TEST_CASE("maze basic properties", "[maze]") {
 
 TEST_CASE("maze contains cell", "[maze]") {
     const Maze maze { 5, 2 };
-    REQUIRE(maze.contains(Cell { 0, 0 }));
-    REQUIRE(maze.contains(Cell { 1, 0 }));
-    REQUIRE(maze.contains(Cell { 2, 0 }));
-    REQUIRE(maze.contains(Cell { 3, 0 }));
-    REQUIRE(maze.contains(Cell { 4, 0 }));
-    REQUIRE(maze.contains(Cell { 0, 1 }));
-    REQUIRE(maze.contains(Cell { 1, 1 }));
-    REQUIRE(maze.contains(Cell { 2, 1 }));
-    REQUIRE(maze.contains(Cell { 3, 1 }));
-    REQUIRE(maze.contains(Cell { 4, 1 }));
-    REQUIRE_FALSE(maze.contains(Cell { -5, -5 }));
-    REQUIRE_FALSE(maze.contains(Cell { 0, -1 }));
-    REQUIRE_FALSE(maze.contains(Cell { -1, 0 }));
-    REQUIRE_FALSE(maze.contains(Cell { -1, -1 }));
-    REQUIRE_FALSE(maze.contains(Cell { 4, 2 }));
-    REQUIRE_FALSE(maze.contains(Cell { 5, 1 }));
-    REQUIRE_FALSE(maze.contains(Cell { 5, 2 }));
-    REQUIRE_FALSE(maze.contains(Cell { 10, 10 }));
+    REQUIRE(contains(maze, Cell { 0, 0 }));
+    REQUIRE(contains(maze, Cell { 1, 0 }));
+    REQUIRE(contains(maze, Cell { 2, 0 }));
+    REQUIRE(contains(maze, Cell { 3, 0 }));
+    REQUIRE(contains(maze, Cell { 4, 0 }));
+    REQUIRE(contains(maze, Cell { 0, 1 }));
+    REQUIRE(contains(maze, Cell { 1, 1 }));
+    REQUIRE(contains(maze, Cell { 2, 1 }));
+    REQUIRE(contains(maze, Cell { 3, 1 }));
+    REQUIRE(contains(maze, Cell { 4, 1 }));
+    REQUIRE_FALSE(contains(maze, Cell { -5, -5 }));
+    REQUIRE_FALSE(contains(maze, Cell { 0, -1 }));
+    REQUIRE_FALSE(contains(maze, Cell { -1, 0 }));
+    REQUIRE_FALSE(contains(maze, Cell { -1, -1 }));
+    REQUIRE_FALSE(contains(maze, Cell { 4, 2 }));
+    REQUIRE_FALSE(contains(maze, Cell { 5, 1 }));
+    REQUIRE_FALSE(contains(maze, Cell { 5, 2 }));
+    REQUIRE_FALSE(contains(maze, Cell { 10, 10 }));
 }
 
 TEST_CASE("maze contains wall", "[maze]") {
     const Maze maze { 2, 3 };
-    REQUIRE(maze.contains(Cell { 0, 0 }.wall(up)));
-    REQUIRE(maze.contains(Cell { 1, 0 }.wall(up)));
-    REQUIRE(maze.contains(Cell { 0, 1 }.wall(up)));
-    REQUIRE(maze.contains(Cell { 1, 1 }.wall(up)));
-    REQUIRE(maze.contains(Cell { 0, 2 }.wall(up)));
-    REQUIRE(maze.contains(Cell { 1, 2 }.wall(up)));
-    REQUIRE(maze.contains(Cell { 0, 2 }.wall(down)));
-    REQUIRE(maze.contains(Cell { 1, 2 }.wall(down)));
-    REQUIRE(maze.contains(Cell { 0, 0 }.wall(left)));
-    REQUIRE(maze.contains(Cell { 0, 1 }.wall(left)));
-    REQUIRE(maze.contains(Cell { 0, 2 }.wall(left)));
-    REQUIRE(maze.contains(Cell { 1, 0 }.wall(left)));
-    REQUIRE(maze.contains(Cell { 1, 1 }.wall(left)));
-    REQUIRE(maze.contains(Cell { 1, 2 }.wall(left)));
-    REQUIRE(maze.contains(Cell { 1, 0 }.wall(right)));
-    REQUIRE(maze.contains(Cell { 1, 1 }.wall(right)));
-    REQUIRE(maze.contains(Cell { 1, 2 }.wall(right)));
-    REQUIRE_FALSE(maze.contains(Cell { 0, -1 }.wall(up)));
-    REQUIRE_FALSE(maze.contains(Cell { 0, 3 }.wall(down)));
-    REQUIRE_FALSE(maze.contains(Cell { -1, 0 }.wall(left)));
-    REQUIRE_FALSE(maze.contains(Cell { 3, 2 }.wall(right)));
+    REQUIRE(contains(maze, wall(Cell { 0, 0 }, up)));
+    REQUIRE(contains(maze, wall(Cell { 1, 0 }, up)));
+    REQUIRE(contains(maze, wall(Cell { 0, 1 }, up)));
+    REQUIRE(contains(maze, wall(Cell { 1, 1 }, up)));
+    REQUIRE(contains(maze, wall(Cell { 0, 2 }, up)));
+    REQUIRE(contains(maze, wall(Cell { 1, 2 }, up)));
+    REQUIRE(contains(maze, wall(Cell { 0, 2 }, down)));
+    REQUIRE(contains(maze, wall(Cell { 1, 2 }, down)));
+    REQUIRE(contains(maze, wall(Cell { 0, 0 }, left)));
+    REQUIRE(contains(maze, wall(Cell { 0, 1 }, left)));
+    REQUIRE(contains(maze, wall(Cell { 0, 2 }, left)));
+    REQUIRE(contains(maze, wall(Cell { 1, 0 }, left)));
+    REQUIRE(contains(maze, wall(Cell { 1, 1 }, left)));
+    REQUIRE(contains(maze, wall(Cell { 1, 2 }, left)));
+    REQUIRE(contains(maze, wall(Cell { 1, 0 }, right)));
+    REQUIRE(contains(maze, wall(Cell { 1, 1 }, right)));
+    REQUIRE(contains(maze, wall(Cell { 1, 2 }, right)));
+    REQUIRE_FALSE(contains(maze, wall(Cell { 0, -1 }, up)));
+    REQUIRE_FALSE(contains(maze, wall(Cell { 0, 3 }, down)));
+    REQUIRE_FALSE(contains(maze, wall(Cell { -1, 0 }, left)));
+    REQUIRE_FALSE(contains(maze, wall(Cell { 3, 2 }, right)));
 }
 
 TEST_CASE("maze boundary walls", "[maze]") {
     const Maze maze { 2, 3 };
-    REQUIRE(maze.is_boundary(Cell { 0, 0 }.wall(up)));
-    REQUIRE(maze.is_boundary(Cell { 1, 0 }.wall(up)));
-    REQUIRE(maze.is_boundary(Cell { 0, 2 }.wall(down)));
-    REQUIRE(maze.is_boundary(Cell { 1, 2 }.wall(down)));
-    REQUIRE(maze.is_boundary(Cell { 0, 0 }.wall(left)));
-    REQUIRE(maze.is_boundary(Cell { 0, 1 }.wall(left)));
-    REQUIRE(maze.is_boundary(Cell { 0, 2 }.wall(left)));
-    REQUIRE(maze.is_boundary(Cell { 1, 0 }.wall(right)));
-    REQUIRE(maze.is_boundary(Cell { 1, 1 }.wall(right)));
-    REQUIRE(maze.is_boundary(Cell { 1, 2 }.wall(right)));
+    REQUIRE(is_boundary(wall(Cell { 0, 0 }, up), maze));
+    REQUIRE(is_boundary(wall(Cell { 1, 0 }, up), maze));
+    REQUIRE(is_boundary(wall(Cell { 0, 2 }, down), maze));
+    REQUIRE(is_boundary(wall(Cell { 1, 2 }, down), maze));
+    REQUIRE(is_boundary(wall(Cell { 0, 0 }, left), maze));
+    REQUIRE(is_boundary(wall(Cell { 0, 1 }, left), maze));
+    REQUIRE(is_boundary(wall(Cell { 0, 2 }, left), maze));
+    REQUIRE(is_boundary(wall(Cell { 1, 0 }, right), maze));
+    REQUIRE(is_boundary(wall(Cell { 1, 1 }, right), maze));
+    REQUIRE(is_boundary(wall(Cell { 1, 2 }, right), maze));
 
     // Internal.
-    REQUIRE_FALSE(maze.is_boundary(Cell { 0, 1 }.wall(up)));
-    REQUIRE_FALSE(maze.is_boundary(Cell { 1, 1 }.wall(up)));
-    REQUIRE_FALSE(maze.is_boundary(Cell { 0, 2 }.wall(up)));
-    REQUIRE_FALSE(maze.is_boundary(Cell { 1, 2 }.wall(up)));
-    REQUIRE_FALSE(maze.is_boundary(Cell { 1, 0 }.wall(left)));
-    REQUIRE_FALSE(maze.is_boundary(Cell { 1, 1 }.wall(left)));
-    REQUIRE_FALSE(maze.is_boundary(Cell { 1, 2 }.wall(left)));
+    REQUIRE_FALSE(is_boundary(wall(Cell { 0, 1 }, up), maze));
+    REQUIRE_FALSE(is_boundary(wall(Cell { 1, 1 }, up), maze));
+    REQUIRE_FALSE(is_boundary(wall(Cell { 0, 2 }, up), maze));
+    REQUIRE_FALSE(is_boundary(wall(Cell { 1, 2 }, up), maze));
+    REQUIRE_FALSE(is_boundary(wall(Cell { 1, 0 }, left), maze));
+    REQUIRE_FALSE(is_boundary(wall(Cell { 1, 1 }, left), maze));
+    REQUIRE_FALSE(is_boundary(wall(Cell { 1, 2 }, left), maze));
 
     // External.
-    REQUIRE_FALSE(maze.is_boundary(Cell { 0, -1 }.wall(up)));
-    REQUIRE_FALSE(maze.is_boundary(Cell { 0, 3 }.wall(down)));
-    REQUIRE_FALSE(maze.is_boundary(Cell { -1, 0 }.wall(left)));
-    REQUIRE_FALSE(maze.is_boundary(Cell { 3, 2 }.wall(right)));
+    REQUIRE_FALSE(is_boundary(wall(Cell { 0, -1 }, up), maze));
+    REQUIRE_FALSE(is_boundary(wall(Cell { 0, 3 }, down), maze));
+    REQUIRE_FALSE(is_boundary(wall(Cell { -1, 0 }, left), maze));
+    REQUIRE_FALSE(is_boundary(wall(Cell { 3, 2 }, right), maze));
 }
 
 TEST_CASE("maze internal walls", "[maze]") {
     const Maze maze { 2, 3 };
-    REQUIRE(maze.is_internal(Cell { 0, 1 }.wall(up)));
-    REQUIRE(maze.is_internal(Cell { 1, 1 }.wall(up)));
-    REQUIRE(maze.is_internal(Cell { 0, 2 }.wall(up)));
-    REQUIRE(maze.is_internal(Cell { 1, 2 }.wall(up)));
-    REQUIRE(maze.is_internal(Cell { 1, 0 }.wall(left)));
-    REQUIRE(maze.is_internal(Cell { 1, 1 }.wall(left)));
-    REQUIRE(maze.is_internal(Cell { 1, 2 }.wall(left)));
+    REQUIRE(is_internal(wall(Cell { 0, 1 }, up), maze));
+    REQUIRE(is_internal(wall(Cell { 1, 1 }, up), maze));
+    REQUIRE(is_internal(wall(Cell { 0, 2 }, up), maze));
+    REQUIRE(is_internal(wall(Cell { 1, 2 }, up), maze));
+    REQUIRE(is_internal(wall(Cell { 1, 0 }, left), maze));
+    REQUIRE(is_internal(wall(Cell { 1, 1 }, left), maze));
+    REQUIRE(is_internal(wall(Cell { 1, 2 }, left), maze));
 
     // Boundary.
-    REQUIRE_FALSE(maze.is_internal(Cell { 0, 0 }.wall(up)));
-    REQUIRE_FALSE(maze.is_internal(Cell { 1, 0 }.wall(up)));
-    REQUIRE_FALSE(maze.is_internal(Cell { 0, 2 }.wall(down)));
-    REQUIRE_FALSE(maze.is_internal(Cell { 1, 2 }.wall(down)));
-    REQUIRE_FALSE(maze.is_internal(Cell { 0, 0 }.wall(left)));
-    REQUIRE_FALSE(maze.is_internal(Cell { 0, 1 }.wall(left)));
-    REQUIRE_FALSE(maze.is_internal(Cell { 0, 2 }.wall(left)));
-    REQUIRE_FALSE(maze.is_internal(Cell { 1, 0 }.wall(right)));
-    REQUIRE_FALSE(maze.is_internal(Cell { 1, 1 }.wall(right)));
-    REQUIRE_FALSE(maze.is_internal(Cell { 1, 2 }.wall(right)));
+    REQUIRE_FALSE(is_internal(wall(Cell { 0, 0 }, up), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { 1, 0 }, up), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { 0, 2 }, down), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { 1, 2 }, down), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { 0, 0 }, left), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { 0, 1 }, left), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { 0, 2 }, left), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { 1, 0 }, right), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { 1, 1 }, right), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { 1, 2 }, right), maze));
 
     // External.
-    REQUIRE_FALSE(maze.is_internal(Cell { 0, -1 }.wall(up)));
-    REQUIRE_FALSE(maze.is_internal(Cell { 0, 3 }.wall(down)));
-    REQUIRE_FALSE(maze.is_internal(Cell { -1, 0 }.wall(left)));
-    REQUIRE_FALSE(maze.is_internal(Cell { 3, 2 }.wall(right)));
+    REQUIRE_FALSE(is_internal(wall(Cell { 0, -1 }, up), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { 0, 3 }, down), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { -1, 0 }, left), maze));
+    REQUIRE_FALSE(is_internal(wall(Cell { 3, 2 }, right), maze));
 }
 
 TEST_CASE("maze cells generator", "[maze]") {
     const Maze maze { 5, 6 };
     const int numCells { 30 };
-    const std::unordered_set uniqueReturnedCells(std::from_range, maze.cells());
+    const std::unordered_set uniqueReturnedCells(std::from_range, cells(maze));
     const long numUniqueReturnedCells { static_cast<long>(uniqueReturnedCells.size()) };
-    const long numReturnedCells { std::ranges::distance(maze.cells()) };
+    const long numReturnedCells { std::ranges::distance(cells(maze)) };
 
     SECTION("returns as many cells as there are in the maze") { REQUIRE(numReturnedCells == numCells); }
     SECTION("all cells are unique") { REQUIRE(numUniqueReturnedCells == numReturnedCells); }
     SECTION("the maze contains all cells") {
-        for (const auto& cell : maze.cells()) {
-            REQUIRE(maze.contains(cell));
+        for (const auto& cell : cells(maze)) {
+            REQUIRE(contains(maze, cell));
         }
     }
 }
@@ -174,15 +174,15 @@ TEST_CASE("cell neighbours generator", "[maze]") {
                                          std::make_pair(Cell { 0, 2 }, 2), std::make_pair(Cell { 1, 2 }, 3),
                                          std::make_pair(Cell { 1, 1 }, 4)) };
 
-    SECTION("returns once for each neighbour") { REQUIRE(std::ranges::distance(maze.neighbours(cell)) == count); }
+    SECTION("returns once for each neighbour") { REQUIRE(std::ranges::distance(neighbours(cell, maze)) == count); }
     SECTION("returns reachable neighbours only") {
-        for (const auto& [neighbour, direction] : maze.neighbours(cell)) {
-            REQUIRE_FALSE(maze.is_set(cell.wall(direction)));
-            REQUIRE(cell.translated(direction) == neighbour);
+        for (const auto& [neighbour, direction] : neighbours(cell, maze)) {
+            REQUIRE_FALSE(maze.is_set(wall(cell, direction)));
+            REQUIRE(GridMazes::neighbour(cell, direction) == neighbour);
         }
     }
     SECTION("all neighbours unique") {
-        auto cellsOnly { maze.neighbours(cell) |
+        auto cellsOnly { neighbours(cell, maze) |
                          std::views::transform([](std::pair<Cell, Direction> pair) { return pair.first; }) };
         REQUIRE(std::unordered_set(std::from_range, cellsOnly).size() == count);
     }
@@ -191,15 +191,15 @@ TEST_CASE("cell neighbours generator", "[maze]") {
 TEST_CASE("maze walls generator", "[maze]") {
     const Maze maze { 3, 2 };
     const int numWalls { 17 };
-    const std::unordered_set uniqueReturnedWalls(std::from_range, maze.walls());
+    const std::unordered_set uniqueReturnedWalls(std::from_range, walls(maze));
     const long numUniqueReturnedWalls { static_cast<long>(uniqueReturnedWalls.size()) };
-    const long numReturnedWalls { std::ranges::distance(maze.walls()) };
+    const long numReturnedWalls { std::ranges::distance(walls(maze)) };
 
     SECTION("returns as many walls as there are in the maze") { REQUIRE(numReturnedWalls == numWalls); }
     SECTION("all walls are unique") { REQUIRE(numUniqueReturnedWalls == numReturnedWalls); }
     SECTION("the maze contains all walls") {
-        for (const auto& wall : maze.walls()) {
-            REQUIRE(maze.contains(wall));
+        for (const auto& wall : walls(maze)) {
+            REQUIRE(contains(maze, wall));
         }
     }
 }
@@ -207,15 +207,15 @@ TEST_CASE("maze walls generator", "[maze]") {
 TEST_CASE("maze internal walls generator", "[maze]") {
     const Maze maze { 4, 15 };
     const int numWalls { 101 };
-    const std::unordered_set uniqueReturnedWalls(std::from_range, maze.internal_walls());
+    const std::unordered_set uniqueReturnedWalls(std::from_range, internal_walls(maze));
     const long numUniqueReturnedWalls { static_cast<long>(uniqueReturnedWalls.size()) };
-    const long numReturnedWalls { std::ranges::distance(maze.internal_walls()) };
+    const long numReturnedWalls { std::ranges::distance(internal_walls(maze)) };
 
     SECTION("returns as many internal walls as there are in the maze") { REQUIRE(numReturnedWalls == numWalls); }
     SECTION("all walls are unique") { REQUIRE(numUniqueReturnedWalls == numReturnedWalls); }
     SECTION("all walls are internal") {
-        for (const auto& wall : maze.internal_walls()) {
-            REQUIRE(maze.is_internal(wall));
+        for (const auto& wall : internal_walls(maze)) {
+            REQUIRE(is_internal(wall, maze));
         }
     }
 }
@@ -223,15 +223,15 @@ TEST_CASE("maze internal walls generator", "[maze]") {
 TEST_CASE("maze boundary walls generator", "[maze]") {
     const Maze maze { 4, 15 };
     const int numWalls { 38 };
-    const std::unordered_set uniqueReturnedWalls(std::from_range, maze.boundary_walls());
+    const std::unordered_set uniqueReturnedWalls(std::from_range, boundary_walls(maze));
     const long numUniqueReturnedWalls { static_cast<long>(uniqueReturnedWalls.size()) };
-    const long numReturnedWalls { std::ranges::distance(maze.boundary_walls()) };
+    const long numReturnedWalls { std::ranges::distance(boundary_walls(maze)) };
 
     SECTION("returns as many boundary walls as there are in the maze") { REQUIRE(numReturnedWalls == numWalls); }
     SECTION("all walls are unique") { REQUIRE(numUniqueReturnedWalls == numReturnedWalls); }
     SECTION("all walls are boundary walls") {
-        for (const auto& wall : maze.boundary_walls()) {
-            REQUIRE(maze.is_boundary(wall));
+        for (const auto& wall : boundary_walls(maze)) {
+            REQUIRE(is_boundary(wall, maze));
         }
     }
 }
@@ -239,15 +239,15 @@ TEST_CASE("maze boundary walls generator", "[maze]") {
 TEST_CASE("maze is_set", "[maze]") {
     const Maze maze { 3, 2 };
     SECTION("boundary walls are set") {
-        for (const auto& wall : maze.boundary_walls()) {
+        for (const auto& wall : boundary_walls(maze)) {
             REQUIRE(maze.is_set(wall));
         }
     }
 
     SECTION("external walls are unset") {
-        REQUIRE_FALSE(maze.is_set(Cell { -1, 0 }.wall(left)));
-        REQUIRE_FALSE(maze.is_set(Cell { -1, -1 }.wall(up)));
-        REQUIRE_FALSE(maze.is_set(Cell { 3, 2 }.wall(left)));
+        REQUIRE_FALSE(maze.is_set(wall(Cell { -1, 0 }, left)));
+        REQUIRE_FALSE(maze.is_set(wall(Cell { -1, -1 }, up)));
+        REQUIRE_FALSE(maze.is_set(wall(Cell { 3, 2 }, left)));
     }
 }
 
@@ -255,7 +255,7 @@ TEST_CASE("maze setters", "[maze]") {
     Maze maze { 3, 2 };
 
     SECTION("internal walls can be set, unset, and toggled") {
-        for (const auto& wall : maze.internal_walls()) {
+        for (const auto& wall : internal_walls(maze)) {
             REQUIRE_FALSE(maze.is_set(wall));
             maze.set(wall);
             REQUIRE(maze.is_set(wall));
@@ -281,11 +281,11 @@ TEST_CASE("maze setters", "[maze]") {
     }
 
     SECTION("walls do not affect each other") {
-        const Wall myWall { Cell { .x = 0, .y = 0 }.wall(right) };
+        const Wall myWall { wall(Cell { .x = 0, .y = 0 }, right) };
         maze.set(myWall);
         REQUIRE(maze.is_set(myWall));
 
-        for (const auto& wall : maze.internal_walls()) {
+        for (const auto& wall : internal_walls(maze)) {
             if (wall != myWall) {
                 REQUIRE_FALSE(maze.is_set(wall));
             }
@@ -296,11 +296,11 @@ TEST_CASE("maze setters", "[maze]") {
 TEST_CASE("maze set_all", "[maze]") {
     Maze maze { 15, 4 }; // NOLINT (magic numbers)
 
-    for (const auto& wall : maze.internal_walls()) {
+    for (const auto& wall : internal_walls(maze)) {
         REQUIRE_FALSE(maze.is_set(wall));
     }
     maze.set_all();
-    for (const auto& wall : maze.internal_walls()) {
+    for (const auto& wall : internal_walls(maze)) {
         REQUIRE(maze.is_set(wall));
     }
 }
@@ -309,12 +309,12 @@ TEST_CASE("maze unset_all", "[maze]") {
     Maze maze { 15, 4 }; // NOLINT (magic numbers)
 
     maze.set_all();
-    for (const auto& wall : maze.internal_walls()) {
+    for (const auto& wall : internal_walls(maze)) {
         REQUIRE(maze.is_set(wall));
     }
 
     maze.unset_all();
-    for (const auto& wall : maze.internal_walls()) {
+    for (const auto& wall : internal_walls(maze)) {
         REQUIRE_FALSE(maze.is_set(wall));
     }
 }
@@ -329,7 +329,7 @@ TEST_CASE("setting any walls makes the maze non-empty", "[maze]") {
     Maze maze { 10, 3 }; // NOLINT (magic numbers)
 
     REQUIRE(maze.all_unset());
-    maze.set(Cell { .x = 0, .y = 0 }.wall(right));
+    maze.set(wall(Cell { .x = 0, .y = 0 }, right));
     REQUIRE_FALSE(maze.all_unset());
 }
 

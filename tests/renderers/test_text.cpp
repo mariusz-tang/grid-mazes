@@ -65,18 +65,18 @@ TEST_CASE("to_text non-empty maze", "[text]") {
     Maze maze { width, height };
 
     using enum Direction;
-    maze.set(Cell { .x = 0, .y = 0 }.wall(down));
-    maze.set(Cell { .x = 1, .y = 1 }.wall(up));
-    maze.set(Cell { .x = 2, .y = 0 }.wall(right));
-    maze.set(Cell { .x = 4, .y = 0 }.wall(down));
-    maze.set(Cell { .x = 2, .y = 1 }.wall(left));
-    maze.set(Cell { .x = 2, .y = 1 }.wall(right));
-    maze.set(Cell { .x = 1, .y = 1 }.wall(down));
-    maze.set(Cell { .x = 3, .y = 1 }.wall(down));
-    maze.set(Cell { .x = 1, .y = 2 }.wall(right));
-    maze.set(Cell { .x = 3, .y = 2 }.wall(right));
-    maze.set(Cell { .x = 0, .y = 2 }.wall(down));
-    maze.set(Cell { .x = 3, .y = 2 }.wall(down));
+    maze.set(wall(Cell { .x = 0, .y = 0 }, down));
+    maze.set(wall(Cell { .x = 1, .y = 1 }, up));
+    maze.set(wall(Cell { .x = 2, .y = 0 }, right));
+    maze.set(wall(Cell { .x = 4, .y = 0 }, down));
+    maze.set(wall(Cell { .x = 2, .y = 1 }, left));
+    maze.set(wall(Cell { .x = 2, .y = 1 }, right));
+    maze.set(wall(Cell { .x = 1, .y = 1 }, down));
+    maze.set(wall(Cell { .x = 3, .y = 1 }, down));
+    maze.set(wall(Cell { .x = 1, .y = 2 }, right));
+    maze.set(wall(Cell { .x = 3, .y = 2 }, right));
+    maze.set(wall(Cell { .x = 0, .y = 2 }, down));
+    maze.set(wall(Cell { .x = 3, .y = 2 }, down));
     REQUIRE(to_text(maze) == expectedResult);
 }
 
@@ -89,11 +89,11 @@ TEST_CASE("parse_text", "[text]") {
                                        "X   X   X\n"
                                        "XXXXXXXXX" };
     Maze expectedResult { 4, 3 };
-    expectedResult.set(Cell { .x = 0, .y = 1 }.wall(right));
-    expectedResult.set(Cell { .x = 1, .y = 0 }.wall(right));
-    expectedResult.set(Cell { .x = 1, .y = 2 }.wall(right));
-    expectedResult.set(Cell { .x = 2, .y = 1 }.wall(down));
-    expectedResult.set(Cell { .x = 3, .y = 0 }.wall(down));
+    expectedResult.set(wall(Cell { .x = 0, .y = 1 }, right));
+    expectedResult.set(wall(Cell { .x = 1, .y = 0 }, right));
+    expectedResult.set(wall(Cell { .x = 1, .y = 2 }, right));
+    expectedResult.set(wall(Cell { .x = 2, .y = 1 }, down));
+    expectedResult.set(wall(Cell { .x = 3, .y = 0 }, down));
 
     REQUIRE(parse_text(input, 4, 3) == expectedResult);
 }
@@ -193,14 +193,14 @@ TEST_CASE("parse_text inverts to_text", "[text]") {
     const int width { 5 };
     const int height { 4 };
     Maze maze { width, height };
-    maze.set(Cell { .x = 0, .y = 0 }.wall(down));
-    maze.set(Cell { .x = 1, .y = 1 }.wall(up));
-    maze.set(Cell { .x = 2, .y = 0 }.wall(right));
-    maze.set(Cell { .x = 4, .y = 0 }.wall(down));
-    maze.set(Cell { .x = 2, .y = 1 }.wall(left));
-    maze.set(Cell { .x = 2, .y = 1 }.wall(right));
-    maze.set(Cell { .x = 1, .y = 1 }.wall(down));
-    maze.set(Cell { .x = 3, .y = 1 }.wall(down));
-    maze.set(Cell { .x = 1, .y = 2 }.wall(right));
+    maze.set(wall(Cell { .x = 0, .y = 0 }, down));
+    maze.set(wall(Cell { .x = 1, .y = 1 }, up));
+    maze.set(wall(Cell { .x = 2, .y = 0 }, right));
+    maze.set(wall(Cell { .x = 4, .y = 0 }, down));
+    maze.set(wall(Cell { .x = 2, .y = 1 }, left));
+    maze.set(wall(Cell { .x = 2, .y = 1 }, right));
+    maze.set(wall(Cell { .x = 1, .y = 1 }, down));
+    maze.set(wall(Cell { .x = 3, .y = 1 }, down));
+    maze.set(wall(Cell { .x = 1, .y = 2 }, right));
     REQUIRE(parse_text(to_text(maze), width, height) == maze);
 }

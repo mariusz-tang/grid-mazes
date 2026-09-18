@@ -88,7 +88,7 @@ std::string to_text(const Maze& maze) {
 
     // Insert walls where present.
     const auto frameWidth { frame_width(maze.width()) };
-    for (const auto& wall : maze.internal_walls()) {
+    for (const auto& wall : internal_walls(maze)) {
         if (maze.is_set(wall)) {
             result[get_index(frameWidth, wall)] = wallMarker;
         }
@@ -119,7 +119,7 @@ std::optional<Maze> parse_text(std::string_view text, int width, int height) {
     Maze result { width, height };
     const int frameWidth { frame_width(width) };
     // Set every wall which is present.
-    for (const auto& wall : result.internal_walls()) {
+    for (const auto& wall : internal_walls(result)) {
         if (text[get_index(frameWidth, wall)] == wallMarker) {
             result.set(wall);
         }

@@ -19,7 +19,7 @@ bool is_tree(const Maze& maze) {
         newCells.pop();
 
         int visitedNeighbours { 0 };
-        for (const auto& [neighbour, _] : maze.neighbours(cell)) {
+        for (const auto& [neighbour, _] : neighbours(cell, maze)) {
             if (visitedCells.contains(neighbour)) {
                 // Keep track of the number of neighbours that have already been visited.
                 visitedNeighbours++;

@@ -12,7 +12,7 @@ enum class Direction : std::uint8_t { up, down, left, right };
 inline constexpr std::array directions { Direction::up, Direction::down, Direction::left, Direction::right };
 
 /** Return the opposite direction. */
-[[nodiscard]] constexpr Direction get_opposite(Direction direction) {
+[[nodiscard]] constexpr Direction opposite(Direction direction) {
     using enum Direction;
     switch (direction) {
     case up:
@@ -27,10 +27,34 @@ inline constexpr std::array directions { Direction::up, Direction::down, Directi
     throw std::runtime_error { "invalid direction" };
 }
 
+/** Represents a cell position in a 2D integer grid. */
+struct Cell {
+    /** Column. */
+    int x { 0 };
+    /** Row. */
+    int y { 0 };
+
+    [[nodiscard]] constexpr bool operator==(this Cell, Cell) noexcept = default;
+};
+
+/** Return the next cell in `direction` from `cell`. */
+[[nodiscard]] constexpr Cell neighbour(Cell cell, Direction direction) {
+    using enum Direction;
+    switch (direction) {
+    case up:
+        return { .x = cell.x, .y = cell.y - 1 };
+    case down:
+        return { .x = cell.x, .y = cell.y + 1 };
+    case left:
+        return { .x = cell.x - 1, .y = cell.y };
+    case right:
+        return { .x = cell.x + 1, .y = cell.y };
+    }
+    throw std::runtime_error { "invalid direction" };
+}
+
 /** Represents an orientation: horizontal or vertical. */
 enum class Orientation : bool { horizontal, vertical };
-
-struct Cell;
 
 /** Represents a wall position in a 2D integer grid; that is, the spaces *between* cells.
  *
@@ -56,62 +80,34 @@ struct Wall {
     Orientation orientation { Orientation::horizontal };
 
     [[nodiscard]] constexpr bool operator==(this Wall, Wall) noexcept = default;
-
-    /** Return the two cells separated by this wall.
-     *
-     * The cell which is left/up from the wall is the first one in the pair. */
-    [[nodiscard]] constexpr std::pair<Cell, Cell> cells() const noexcept;
 };
 
-/** Represents a cell position in a 2D integer grid. */
-struct Cell {
-    /** Column. */
-    int x { 0 };
-    /** Row. */
-    int y { 0 };
-
-    [[nodiscard]] constexpr bool operator==(this Cell, Cell) noexcept = default;
-
-    /** Return the cell `distance` away in `direction` from this one. */
-    [[nodiscard]] constexpr Cell translated(Direction direction, int distance = 1) const {
-        using enum Direction;
-        switch (direction) {
-        case up:
-            return { .x = x, .y = y - distance };
-        case down:
-            return { .x = x, .y = y + distance };
-        case left:
-            return { .x = x - distance, .y = y };
-        case right:
-            return { .x = x + distance, .y = y };
-        }
-        throw std::runtime_error { "invalid direction" };
+/** Return the wall in `direction` from `cell`. */
+[[nodiscard]] constexpr Wall wall(Cell cell, Direction direction) {
+    using enum Direction;
+    using enum Orientation;
+    switch (direction) {
+    case up:
+        return { .line = cell.y, .offset = cell.x, .orientation = horizontal };
+    case down:
+        return { .line = cell.y + 1, .offset = cell.x, .orientation = horizontal };
+    case left:
+        return { .line = cell.x, .offset = cell.y, .orientation = vertical };
+    case right:
+        return { .line = cell.x + 1, .offset = cell.y, .orientation = vertical };
     }
+    throw std::runtime_error { "invalid direction" };
+}
 
-    /** Return the wall in `direction` from this cell. */
-    [[nodiscard]] constexpr Wall wall(Direction direction) const {
-        using enum Direction;
-        using enum Orientation;
-        switch (direction) {
-        case up:
-            return { .line = y, .offset = x, .orientation = horizontal };
-        case down:
-            return { .line = y + 1, .offset = x, .orientation = horizontal };
-        case left:
-            return { .line = x, .offset = y, .orientation = vertical };
-        case right:
-            return { .line = x + 1, .offset = y, .orientation = vertical };
-        }
-        throw std::runtime_error { "invalid direction" };
-    }
-};
-
-constexpr std::pair<Cell, Cell> Wall::cells() const noexcept {
-    switch (orientation) {
+/** Return the two cells separated by `wall`.
+ *
+ * The cell which is left/up from the wall is the first one in the pair. */
+[[nodiscard]] constexpr std::pair<Cell, Cell> neighbours(Wall wall) noexcept {
+    switch (wall.orientation) {
     case Orientation::horizontal:
-        return { { .x = offset, .y = line - 1 }, { .x = offset, .y = line } };
+        return { { .x = wall.offset, .y = wall.line - 1 }, { .x = wall.offset, .y = wall.line } };
     case Orientation::vertical:
-        return { { .x = line - 1, .y = offset }, { .x = line, .y = offset } };
+        return { { .x = wall.line - 1, .y = wall.offset }, { .x = wall.line, .y = wall.offset } };
     }
 }
 } // namespace GridMazes

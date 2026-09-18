@@ -6,8 +6,10 @@
 #include <cstddef>
 #include <format>
 #include <generator>
+#include <ranges>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
 namespace GridMazes {
 using enum Direction;
@@ -26,95 +28,10 @@ Maze::Maze(int width, int height)
     }
 }
 
-bool Maze::contains(Cell cell) const noexcept {
-    const bool has_column { 0 <= cell.x && cell.x < m_width };
-    const bool has_row { 0 <= cell.y && cell.y < m_height };
-    return has_column && has_row;
-}
-
-bool Maze::contains(Wall wall) const noexcept {
-    int max_line {};
-    int max_offset {};
-
-    switch (wall.orientation) {
-    case Orientation::horizontal:
-        max_offset = m_width - 1;
-        max_line = m_height;
-        break;
-    case Orientation::vertical:
-        max_offset = m_height - 1;
-        max_line = m_width;
-        break;
-    }
-    const bool has_line { 0 <= wall.line && wall.line <= max_line };
-    const bool has_offset { 0 <= wall.offset && wall.offset <= max_offset };
-    return has_line && has_offset;
-}
-
-bool Maze::is_boundary(Wall wall) const noexcept {
-    if (!contains(wall)) {
-        return false;
-    }
-
-    switch (wall.orientation) {
-    case Orientation::horizontal:
-        return wall.line == 0 || wall.line == height();
-    case Orientation::vertical:
-        return wall.line == 0 || wall.line == width();
-    }
-}
-
-bool Maze::is_internal(Wall wall) const noexcept { return contains(wall) && !is_boundary(wall); }
-
-std::generator<Cell> Maze::cells() const noexcept {
-    for (int column { 0 }; column < m_width; column++) {
-        for (int row { 0 }; row < m_height; row++) {
-            co_yield { .x = column, .y = row };
-        }
-    }
-}
-
-std::generator<std::pair<Cell, Direction>> Maze::neighbours(Cell cell) const {
-    for (const auto& direction : directions) {
-        if (!is_set(cell.wall(direction))) {
-            co_yield { cell.translated(direction), direction };
-        }
-    }
-}
-
-std::generator<Wall> Maze::walls() const noexcept {
-    for (int line { 0 }; line <= m_height; line++) {
-        for (int offset { 0 }; offset < m_width; offset++) {
-            co_yield { .line = line, .offset = offset, .orientation = Orientation::horizontal };
-        }
-    }
-    for (int line { 0 }; line <= m_width; line++) {
-        for (int offset { 0 }; offset < m_height; offset++) {
-            co_yield { .line = line, .offset = offset, .orientation = Orientation::vertical };
-        }
-    }
-}
-
-std::generator<Wall> Maze::internal_walls() const noexcept {
-    for (const auto& wall : walls()) {
-        if (is_internal(wall)) {
-            co_yield wall;
-        }
-    }
-}
-
-std::generator<Wall> Maze::boundary_walls() const noexcept {
-    for (const auto& wall : walls()) {
-        if (is_boundary(wall)) {
-            co_yield wall;
-        }
-    }
-}
-
 namespace {
 /** Get the unique index of an internal wall in a maze. */
 [[nodiscard]] int get_internal_wall_index(const Maze& maze, Wall wall) {
-    assert(maze.is_internal(wall));
+    assert(is_internal(wall, maze));
 
     switch (wall.orientation) {
     case Orientation::horizontal:
@@ -129,10 +46,10 @@ namespace {
 } // namespace
 
 [[nodiscard]] bool Maze::is_set(Wall wall) const noexcept {
-    if (!contains(wall)) {
+    if (!contains(*this, wall)) {
         return false;
     }
-    if (is_boundary(wall)) {
+    if (is_boundary(wall, *this)) {
         return true;
     }
     return m_internalWalls[get_internal_wall_index(*this, wall)];
@@ -141,7 +58,7 @@ namespace {
 namespace {
 /** Throw an exception if `wall` cannot be set/unset in `maze`. */
 void throw_if_immutable(const Maze& maze, Wall wall) {
-    if (!maze.is_internal(wall)) {
+    if (!is_internal(wall, maze)) {
         throw std::runtime_error("tried to set or unset a non-internal wall");
     }
 }
@@ -165,4 +82,107 @@ void Maze::toggle(Wall wall) {
         set(wall);
     }
 }
+
+bool contains(const Maze& maze, Cell cell) noexcept {
+    const bool has_column { 0 <= cell.x && cell.x < maze.width() };
+    const bool has_row { 0 <= cell.y && cell.y < maze.height() };
+    return has_column && has_row;
+}
+
+bool contains(const Maze& maze, Wall wall) noexcept {
+    int max_line {};
+    int max_offset {};
+
+    switch (wall.orientation) {
+    case Orientation::horizontal:
+        max_offset = maze.width() - 1;
+        max_line = maze.height();
+        break;
+    case Orientation::vertical:
+        max_offset = maze.height() - 1;
+        max_line = maze.width();
+        break;
+    }
+    const bool has_line { 0 <= wall.line && wall.line <= max_line };
+    const bool has_offset { 0 <= wall.offset && wall.offset <= max_offset };
+    return has_line && has_offset;
+}
+
+bool is_boundary(Wall wall, const Maze& maze) noexcept {
+    if (!contains(maze, wall)) {
+        return false;
+    }
+
+    switch (wall.orientation) {
+    case Orientation::horizontal:
+        return wall.line == 0 || wall.line == maze.height();
+    case Orientation::vertical:
+        return wall.line == 0 || wall.line == maze.width();
+    }
+}
+
+bool is_internal(Wall wall, const Maze& maze) noexcept { return contains(maze, wall) && !is_boundary(wall, maze); }
+
+namespace {
+/** Return the cells of a maze with shape `width` by `height`. */
+std::generator<Cell> maze_cells(int width, int height) noexcept {
+    for (int column { 0 }; column < width; column++) {
+        for (int row { 0 }; row < height; row++) {
+            co_yield { .x = column, .y = row };
+        }
+    }
+}
+} // namespace
+
+std::generator<Cell> cells(const Maze& maze) noexcept { return maze_cells(maze.width(), maze.height()); }
+
+std::vector<std::pair<Cell, Direction>> neighbours(Cell cell, const Maze& maze) {
+    std::vector<std::pair<Cell, Direction>> result {};
+    for (const auto& direction : directions) {
+        if (!maze.is_set(wall(cell, direction))) {
+            result.emplace_back(neighbour(cell, direction), direction);
+        }
+    }
+    return result;
+}
+
+namespace {
+/** Return the internal walls for a `width` by `height` maze. */
+std::generator<Wall> internal_walls(int width, int height) noexcept {
+    for (int line { 1 }; line < height; line++) {
+        for (int offset { 0 }; offset < width; offset++) {
+            co_yield { .line = line, .offset = offset, .orientation = Orientation::horizontal };
+        }
+    }
+    for (int line { 1 }; line < width; line++) {
+        for (int offset { 0 }; offset < height; offset++) {
+            co_yield { .line = line, .offset = offset, .orientation = Orientation::vertical };
+        }
+    }
+}
+
+/** Return the boundary walls for a `width` by `height` maze. */
+std::generator<Wall> boundary_walls(int width, int height) noexcept {
+    for (int offset { 0 }; offset < width; offset++) {
+        co_yield { .line = 0, .offset = offset, .orientation = Orientation::horizontal };
+        co_yield { .line = height, .offset = offset, .orientation = Orientation::horizontal };
+    }
+    for (int offset { 0 }; offset < height; offset++) {
+        co_yield { .line = 0, .offset = offset, .orientation = Orientation::vertical };
+        co_yield { .line = width, .offset = offset, .orientation = Orientation::vertical };
+    }
+}
+
+/** Return the internal and boundary walls for a `width` by `height` maze. */
+std::generator<Wall> walls(int width, int height) noexcept {
+    co_yield std::ranges::elements_of(internal_walls(width, height));
+    co_yield std::ranges::elements_of(boundary_walls(width, height));
+}
+} // namespace
+
+std::generator<Wall> walls(const Maze& maze) noexcept { return walls(maze.width(), maze.height()); }
+
+std::generator<Wall> internal_walls(const Maze& maze) noexcept { return internal_walls(maze.width(), maze.height()); }
+
+std::generator<Wall> boundary_walls(const Maze& maze) noexcept { return boundary_walls(maze.width(), maze.height()); }
 } // namespace GridMazes

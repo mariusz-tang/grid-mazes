@@ -43,38 +43,6 @@ class Maze {
     /** Get the number of cells in the maze */
     [[nodiscard]] std::size_t size() const noexcept { return static_cast<std::size_t>(m_width) * m_height; }
 
-    /** Return true if `cell` is within the bounds of this maze. */
-    [[nodiscard]] bool contains(Cell cell) const noexcept;
-    /** Return true if `wall` is a boundary or internal wall. */
-    [[nodiscard]] bool contains(Wall wall) const noexcept;
-
-    /** Return true if the wall is on the boundary of the maze. */
-    [[nodiscard]] bool is_boundary(Wall wall) const noexcept;
-    /** Return true if the wall is within, but not on, the boundary of the maze. */
-    [[nodiscard]] bool is_internal(Wall wall) const noexcept;
-
-    /** Return all of the cells contained within the bounds of the maze.
-     *
-     * Each cell is returned exactly once, in an unspecified order. */
-    [[nodiscard]] std::generator<Cell> cells() const noexcept;
-    /** Return direction/neighbour pairs for each reachable cell adjancent to `cell`.
-     *
-     * A neighbour is "reachable" if the wall between it and `cell` is passable. */
-    [[nodiscard]] std::generator<std::pair<Cell, Direction>> neighbours(Cell cell) const;
-
-    /** Return all of the boundary and internal walls of the maze.
-     *
-     * Each wall is returned exactly once, in an unspecified order. */
-    [[nodiscard]] std::generator<Wall> walls() const noexcept;
-    /** Return all of the internal walls of the maze.
-     *
-     * Each wall is returned exactly once, in an unspecified order. */
-    [[nodiscard]] std::generator<Wall> internal_walls() const noexcept;
-    /** Return all of the boundary walls of the maze.
-     *
-     * Each wall is returned exactly once, in an unspecified order. */
-    [[nodiscard]] std::generator<Wall> boundary_walls() const noexcept;
-
     /** Return true if the wall is set.
      *
      * External walls are always unset, and boundary walls are always set. */
@@ -108,6 +76,38 @@ class Maze {
     int m_height;
     boost::dynamic_bitset<> m_internalWalls;
 };
+
+/** Return true if `cell` is within the bounds of `maze`. */
+[[nodiscard]] bool contains(const Maze& maze, Cell cell) noexcept;
+/** Return true if `wall` is a boundary or internal wall in `maze`. */
+[[nodiscard]] bool contains(const Maze& maze, Wall wall) noexcept;
+
+/** Return true if the wall is on the boundary of `maze`. */
+[[nodiscard]] bool is_boundary(Wall wall, const Maze& maze) noexcept;
+/** Return true if the wall is within, but not on, the boundary of `maze`. */
+[[nodiscard]] bool is_internal(Wall wall, const Maze& maze) noexcept;
+
+/** Return all of the cells contained within the bounds of `maze`.
+ *
+ * Each cell is returned exactly once, in an unspecified order. */
+[[nodiscard]] std::generator<Cell> cells(const Maze& maze) noexcept;
+/** Return a collection of direction/neighbour pairs for each reachable cell adjancent to `cell` in `maze`.
+ *
+ * A neighbour is "reachable" if the wall between it and `cell` is passable. */
+[[nodiscard]] std::vector<std::pair<Cell, Direction>> neighbours(Cell cell, const Maze& maze);
+
+/** Return all of the boundary and internal walls of `maze`.
+ *
+ * Each wall is returned exactly once, in an unspecified order. */
+[[nodiscard]] std::generator<Wall> walls(const Maze& maze) noexcept;
+/** Return all of the internal walls of `maze`.
+ *
+ * Each wall is returned exactly once, in an unspecified order. */
+[[nodiscard]] std::generator<Wall> internal_walls(const Maze& maze) noexcept;
+/** Return all of the boundary walls of `maze`.
+ *
+ * Each wall is returned exactly once, in an unspecified order. */
+[[nodiscard]] std::generator<Wall> boundary_walls(const Maze& maze) noexcept;
 } // namespace GridMazes
 
 template <>

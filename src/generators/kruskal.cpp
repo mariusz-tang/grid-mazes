@@ -20,7 +20,7 @@ using CellGroupMap = std::unordered_map<Cell, std::shared_ptr<CellGroup>>;
 /** Return one group for each cell, containing that cell only. */
 [[nodiscard]] CellGroupMap make_cell_groups(const Maze& maze) {
     CellGroupMap groups {};
-    for (const auto& cell : maze.cells()) {
+    for (const auto& cell : cells(maze)) {
         groups[cell] = std::make_shared<CellGroup>();
         groups[cell]->insert(cell);
     }
@@ -62,13 +62,13 @@ std::generator<const Maze&> kruskal_steps(Maze maze, std::vector<Wall> orderedWa
     co_yield maze;
 
     for (const auto& wall : orderedWalls) {
-        assert(maze.is_internal(wall));
+        assert(is_internal(wall, maze));
 
         // If the wall separates two different groups...
-        if (!in_same_group(groups_by_cell, wall.cells())) {
+        if (!in_same_group(groups_by_cell, neighbours(wall))) {
             // ...then make it passable and merge the groups.
             maze.unset(wall);
-            merge_cell_groups(groups_by_cell, wall.cells());
+            merge_cell_groups(groups_by_cell, neighbours(wall));
             co_yield maze;
         }
     }
@@ -84,13 +84,13 @@ Maze kruskal(Maze& maze, const std::vector<Wall>& orderedWalls) {
     maze.set_all();
 
     for (const auto& wall : orderedWalls) {
-        assert(maze.is_internal(wall));
+        assert(is_internal(wall, maze));
 
         // If the wall separates two different groups...
-        if (!in_same_group(groups_by_cell, wall.cells())) {
+        if (!in_same_group(groups_by_cell, neighbours(wall))) {
             // ...then make it passable and merge the groups.
             maze.unset(wall);
-            merge_cell_groups(groups_by_cell, wall.cells());
+            merge_cell_groups(groups_by_cell, neighbours(wall));
         }
     }
     return maze;
