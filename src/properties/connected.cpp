@@ -20,7 +20,7 @@ namespace {
         newCells.pop();
 
         // Add its unvisited neighbours to the visited cells and the stack.
-        for (const auto& [neighbour, _] : neighbours(cell, maze)) {
+        for (const auto& neighbour : neighbours(cell, maze)) {
             if (!visitedCells.contains(neighbour)) {
                 visitedCells.insert(neighbour);
                 newCells.push(neighbour);

@@ -91,10 +91,15 @@ class Maze {
  *
  * Each cell is returned exactly once, in an unspecified order. */
 [[nodiscard]] std::generator<Cell> cells(const Maze& maze) noexcept;
+
+/** Return a collection of the reachable cells adjacent to `cell` in `maze`.
+ *
+ * A neighbour is "reachable" if the wall between it and `cell` is passable. */
+[[nodiscard]] std::vector<Cell> neighbours(Cell cell, const Maze& maze);
 /** Return a collection of direction/neighbour pairs for each reachable cell adjancent to `cell` in `maze`.
  *
  * A neighbour is "reachable" if the wall between it and `cell` is passable. */
-[[nodiscard]] std::vector<std::pair<Cell, Direction>> neighbours(Cell cell, const Maze& maze);
+[[nodiscard]] std::vector<std::pair<Cell, Direction>> directed_neighbours(Cell cell, const Maze& maze);
 
 /** Return all of the boundary and internal walls of `maze`.
  *

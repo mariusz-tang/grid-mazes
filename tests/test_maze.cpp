@@ -2,6 +2,7 @@
 #include "gridmazes/maze.hpp"
 #include "gridmazes/renderers/text.hpp"
 
+#include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <format>
@@ -9,6 +10,7 @@
 #include <ranges>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 
 using namespace GridMazes;
 using enum Direction;
@@ -159,7 +161,7 @@ TEST_CASE("maze cells generator", "[maze]") {
     }
 }
 
-TEST_CASE("cell neighbours generator", "[maze]") {
+TEST_CASE("cell directed neighbours generator", "[maze]") {
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     const Maze maze { parse_text("XXXXXXX\n"
                                  "X X   X\n"
@@ -174,17 +176,41 @@ TEST_CASE("cell neighbours generator", "[maze]") {
                                          std::make_pair(Cell { 0, 2 }, 2), std::make_pair(Cell { 1, 2 }, 3),
                                          std::make_pair(Cell { 1, 1 }, 4)) };
 
-    SECTION("returns once for each neighbour") { REQUIRE(std::ranges::distance(neighbours(cell, maze)) == count); }
+    SECTION("returns once for each neighbour") {
+        REQUIRE(std::ranges::distance(directed_neighbours(cell, maze)) == count);
+    }
     SECTION("returns reachable neighbours only") {
-        for (const auto& [neighbour, direction] : neighbours(cell, maze)) {
+        for (const auto& [neighbour, direction] : directed_neighbours(cell, maze)) {
             REQUIRE_FALSE(maze.is_set(wall(cell, direction)));
             REQUIRE(GridMazes::neighbour(cell, direction) == neighbour);
         }
     }
     SECTION("all neighbours unique") {
-        auto cellsOnly { neighbours(cell, maze) |
+        auto cellsOnly { directed_neighbours(cell, maze) |
                          std::views::transform([](std::pair<Cell, Direction> pair) { return pair.first; }) };
         REQUIRE(std::unordered_set(std::from_range, cellsOnly).size() == count);
+    }
+}
+
+TEST_CASE("cell neighbours generator returns the same as directed neighbours without the directions", "[maze]") {
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+    const Maze maze { parse_text("XXXXXXX\n"
+                                 "X X   X\n"
+                                 "XXX XXX\n"
+                                 "X     X\n"
+                                 "X X X X\n"
+                                 "X     X\n"
+                                 "XXXXXXX",
+                                 3, 3)
+                          .value() };
+    const auto cell { GENERATE(Cell { 0, 0 }, Cell { 2, 0 }, Cell { 0, 2 }, Cell { 1, 2 }, Cell { 1, 1 }) };
+
+    const std::vector directed { directed_neighbours(cell, maze) };
+    const std::vector undirected { neighbours(cell, maze) };
+
+    REQUIRE(directed.size() == undirected.size());
+    for (const auto& [neighbour, _] : directed) {
+        REQUIRE(std::ranges::contains(undirected, neighbour));
     }
 }
 

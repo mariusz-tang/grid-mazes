@@ -116,7 +116,17 @@ std::generator<Cell> maze_cells(int width, int height) noexcept {
 
 std::generator<Cell> cells(const Maze& maze) noexcept { return maze_cells(maze.width(), maze.height()); }
 
-std::vector<std::pair<Cell, Direction>> neighbours(Cell cell, const Maze& maze) {
+std::vector<Cell> neighbours(Cell cell, const Maze& maze) {
+    std::vector<Cell> result {};
+    for (const auto& direction : directions) {
+        if (!maze.is_set(wall(cell, direction))) {
+            result.push_back(neighbour(cell, direction));
+        }
+    }
+    return result;
+}
+
+std::vector<std::pair<Cell, Direction>> directed_neighbours(Cell cell, const Maze& maze) {
     std::vector<std::pair<Cell, Direction>> result {};
     for (const auto& direction : directions) {
         if (!maze.is_set(wall(cell, direction))) {
