@@ -3,36 +3,45 @@
  * Source:
  * https://en.wikipedia.org/wiki/Kruskal's_algorithm */
 #pragma once
+#include "gridmazes/generators/common.hpp"
 #include "gridmazes/maze.hpp"
 
-#include <generator>
+#include <algorithm>
+#include <ranges>
+#include <unordered_set>
 #include <vector>
 
 namespace GridMazes {
+
 namespace Private {
-[[nodiscard]] std::generator<const Maze&> kruskal_steps(Maze maze, std::vector<Wall> orderedWalls);
-[[nodiscard]] Maze kruskal(Maze& maze, const std::vector<Wall>& orderedWalls);
+using CellGroup = std::unordered_set<Cell>;
+using CellGroupMap = std::unordered_map<Cell, std::shared_ptr<CellGroup>>;
+
+[[nodiscard]] CellGroupMap make_cell_groups(const Maze& maze);
 } // namespace Private
 
-/** Return each step of generating a `width` by `height` maze using Kruskal's algorithm.
+/** Represents a Kruskal's algorithm maze generator.
  *
- * `RNG` should satisfy RandomNumberEngine. */
-template <typename RNG>
-[[nodiscard]] std::generator<const Maze&> kruskal_steps(int width, int height, RNG&& rng) {
-    Maze maze { width, height };
-    std::vector walls(std::from_range, internal_walls(maze));
-    std::ranges::shuffle(walls, std::forward<RNG>(rng));
-    return Private::kruskal_steps(std::move(maze), std::move(walls));
-}
+ * `RNG` should satisfy the RandomNumberEngine named requirement. */
+class KruskalGenerator : public CommonGenerator {
+  public:
+    template <typename RNG>
+    KruskalGenerator(int width, int height, RNG&& rng)
+        : CommonGenerator(width, height), m_walls { std::from_range, internal_walls(m_maze) },
+          m_groups_by_cell { Private::make_cell_groups(m_maze) } {
+        // Start with all walls set.
+        m_maze.set_all();
+        // Shuffle the walls now so we don't have to keep a pointer to rng.
+        std::ranges::shuffle(m_walls, std::forward<RNG>(rng));
+    }
 
-/** Generate a `width` by `height` maze using Kruskal's algorithm.
- *
- * `RNG` should satisfy RandomNumberEngine. */
-template <typename RNG>
-[[nodiscard]] Maze kruskal(int width, int height, RNG&& rng) {
-    Maze maze { width, height };
-    std::vector walls(std::from_range, internal_walls(maze));
-    std::ranges::shuffle(walls, std::forward<RNG>(rng));
-    return Private::kruskal(maze, walls);
-}
+  protected:
+    void step_impl() override;
+
+  private:
+    std::vector<Wall> m_walls;
+    Private::CellGroupMap m_groups_by_cell;
+    std::size_t m_position { 0 };
+};
+
 } // namespace GridMazes

@@ -4,20 +4,15 @@
 #include "gridmazes/maze.hpp"
 
 #include <cassert>
-#include <generator>
 #include <memory>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
 namespace GridMazes {
 
-namespace {
-using CellGroup = std::unordered_set<Cell>;
-using CellGroupMap = std::unordered_map<Cell, std::shared_ptr<CellGroup>>;
-
-/** Return one group for each cell, containing that cell only. */
+namespace Private {
+/** Place each cell into its own group. */
 [[nodiscard]] CellGroupMap make_cell_groups(const Maze& maze) {
     CellGroupMap groups {};
     for (const auto& cell : cells(maze)) {
@@ -26,6 +21,11 @@ using CellGroupMap = std::unordered_map<Cell, std::shared_ptr<CellGroup>>;
     }
     return groups;
 }
+} // namespace Private
+
+namespace {
+using Private::CellGroup;
+using Private::CellGroupMap;
 
 /** Return true if the pair of cells are in the same group. */
 bool in_same_group(const CellGroupMap& groups_by_cell, const std::pair<Cell, Cell>& cells) {
@@ -49,51 +49,25 @@ void merge_cell_groups(CellGroupMap& groups_by_cell, const std::pair<Cell, Cell>
 }
 } // namespace
 
-namespace Private {
+void KruskalGenerator::step_impl() {
+    assert(m_position < m_walls.size());
+    assert(!in_same_group(m_groups_by_cell, neighbours(m_walls[m_position])));
 
-/** Generate a maze in `maze` using Kruskal's algorithm and return a reference to the maze at each step.
- *
- * `orderedWalls` determines the order in which the walls are checked. */
-std::generator<const Maze&> kruskal_steps(Maze maze, std::vector<Wall> orderedWalls) {
-    CellGroupMap groups_by_cell { make_cell_groups(maze) };
+    // Remove the next wall.
+    const Wall wall { m_walls[m_position] };
+    m_maze.unset(wall);
+    merge_cell_groups(m_groups_by_cell, neighbours(wall));
 
-    // Start with all walls impassable.
-    maze.set_all();
-    co_yield maze;
+    // Advance until we reach a wall which separates two different groups or we run out of walls.
+    m_position++;
+    while (m_position < m_walls.size() && in_same_group(m_groups_by_cell, neighbours(m_walls[m_position]))) {
+        m_position++;
+    }
 
-    for (const auto& wall : orderedWalls) {
-        assert(is_internal(wall, maze));
-
-        // If the wall separates two different groups...
-        if (!in_same_group(groups_by_cell, neighbours(wall))) {
-            // ...then make it passable and merge the groups.
-            maze.unset(wall);
-            merge_cell_groups(groups_by_cell, neighbours(wall));
-            co_yield maze;
-        }
+    // If we ran out of walls then we are done.
+    if (m_position == m_walls.size()) {
+        m_terminated = true;
     }
 }
 
-/** Generate a maze in `maze` using Kruskal's algorithm.
- *
- * `orderedWalls` determines the order in which the walls are checked. */
-Maze kruskal(Maze& maze, const std::vector<Wall>& orderedWalls) {
-    CellGroupMap groups_by_cell { make_cell_groups(maze) };
-
-    // Start with all walls impassable.
-    maze.set_all();
-
-    for (const auto& wall : orderedWalls) {
-        assert(is_internal(wall, maze));
-
-        // If the wall separates two different groups...
-        if (!in_same_group(groups_by_cell, neighbours(wall))) {
-            // ...then make it passable and merge the groups.
-            maze.unset(wall);
-            merge_cell_groups(groups_by_cell, neighbours(wall));
-        }
-    }
-    return maze;
-}
-} // namespace Private
 } // namespace GridMazes

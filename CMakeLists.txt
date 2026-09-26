@@ -15,6 +15,7 @@ target_sources(
     gridmazes
     PRIVATE
         src/maze.cpp
+        src/generators/common.cpp
         src/generators/kruskal.cpp
         src/properties/connected.cpp
         src/properties/tree.cpp
@@ -25,6 +26,8 @@ target_sources(
             FILES
                 include/gridmazes/grid.hpp
                 include/gridmazes/maze.hpp
+                include/gridmazes/generators/common.hpp
+                include/gridmazes/generators/generator.hpp
                 include/gridmazes/generators/kruskal.hpp
                 include/gridmazes/properties/connected.hpp
                 include/gridmazes/properties/tree.hpp
