@@ -2,8 +2,6 @@
 #pragma once
 #include "gridmazes/maze.hpp"
 
-#include <memory>
-
 namespace GridMazes {
 
 /** Abstract class representing a maze generation algorithm taking maze shape as input.
