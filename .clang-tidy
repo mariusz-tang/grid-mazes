@@ -4,6 +4,7 @@ CheckOptions:
   readability-identifier-length.IgnoredParameterNames: '^os$'
   readability-identifier-length.IgnoredVariableNames: '^_$'
   bugprone-easily-swappable-parameters.IgnoredParameterNames: 'width;height'
+  bugprone-exception-escape.CheckMain: false
   # Prevent diving into Catch2 macros. We should be avoiding macros in our own code anyway.
   readability-function-cognitive-complexity.IgnoreMacros: true
 WarningsAsErrors: "*"

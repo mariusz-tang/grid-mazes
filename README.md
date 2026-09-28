@@ -10,20 +10,24 @@ This project is a work-in-progess. This is what is implemented so far:
 - Maze-to-text renderer.
 - Kruskal's algorithm maze generator.
 - Maze connectedness checker.
+- Basic command-line interface.
 
 Here are some planned features:
 
 - more maze generation algorithms.
 - maze solving algorithms.
 - Maze-to-image renderer.
-- CLI to showcase the algorithms.
 - GUI to showcase the algorithms plus interactive features like manual maze input.
 - Benchmarking.
 
 ## Dependencies
 
 - Boost (for dynamic bitsets and hashing utilities).
-- Catch2 (for unit tests). (downloaded using `FetchContent`)
+
+### Downloaded using `FetchContent`
+
+- Catch2 (for unit tests).
+- CLI11 (for the command-line parser).
 
 ## Setup
 
@@ -41,6 +45,21 @@ errors:
 cmake --compile-no-warning-as-error build
 cmake --build build
 ```
+
+### Command-line interface
+
+This project comes with a command-line interface! Try it out:
+
+```bash
+# See the help.
+gridmazes-cli --help
+# See the help for a subcommand.
+gridmazes-cli --help generate
+# Generate a 5x5 maze.
+gridmazes-cli generate 5 5
+```
+
+Using the default preset, the executable is placed in `./build/cli/gridmazes-cli`.
 
 ### Unit tests
 

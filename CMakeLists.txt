@@ -48,6 +48,9 @@ elseif(
     target_compile_options(gridmazes PRIVATE /Wall)
 endif()
 
+# CLI.
+add_subdirectory(cli)
+
 # Tests.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(CTest)
