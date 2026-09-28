@@ -18,10 +18,10 @@ class CommonGenerator {
      * Child classes can overwrite `m_terminated` to override this behaviour. */
     CommonGenerator(int width, int height);
 
-    CommonGenerator(const CommonGenerator&) = default;
-    CommonGenerator(CommonGenerator&&) noexcept = default;
-    CommonGenerator& operator=(const CommonGenerator&) = default;
-    CommonGenerator& operator=(CommonGenerator&&) noexcept = default;
+    CommonGenerator(const CommonGenerator&) = delete;
+    CommonGenerator(CommonGenerator&&) noexcept = delete;
+    CommonGenerator& operator=(const CommonGenerator&) = delete;
+    CommonGenerator& operator=(CommonGenerator&&) noexcept = delete;
     virtual ~CommonGenerator() = default;
 
     /** The current state of the maze. */
