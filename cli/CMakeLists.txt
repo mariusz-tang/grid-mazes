@@ -10,7 +10,7 @@ FetchContent_MakeAvailable(cli11)
 
 # Targets.
 add_executable(gridmazes-cli)
-target_sources(gridmazes-cli PRIVATE main.cpp random.h)
+target_sources(gridmazes-cli PRIVATE main.cpp random.hpp)
 target_link_libraries(gridmazes-cli PRIVATE gridmazes CLI11::CLI11)
 target_compile_features(gridmazes PRIVATE cxx_std_23)
 
