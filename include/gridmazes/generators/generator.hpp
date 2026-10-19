@@ -29,6 +29,7 @@ concept Generator = requires(T generator) {
 template <Generator T, typename... Args>
 [[nodiscard]] std::generator<const Maze&> steps(Args&&... args) {
     T generator { std::forward<Args>(args)... };
+    co_yield generator.state();
     while (!generator.has_terminated()) {
         co_yield generator.step();
     }
