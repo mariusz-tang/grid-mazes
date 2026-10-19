@@ -16,15 +16,17 @@ TEST_CASE("kruskal's terminates immediately on 1x1 maze", "[kruskal]") {
 }
 
 TEST_CASE("kruskal's algorithm generates trees", "[kruskal]") {
-    const auto& [width, height] { GENERATE(std::make_pair(2, 4), std::make_pair(4, 6), std::make_pair(5, 10),
-                                           std::make_pair(12, 7)) };
+    const auto& [width, height] {
+        GENERATE(std::make_pair(2, 4), std::make_pair(4, 6), std::make_pair(5, 10), std::make_pair(12, 7)),
+    };
     const Maze maze { generate<KruskalGenerator>(width, height, std::mt19937 { std::random_device {}() }) };
     REQUIRE(is_tree(maze));
 }
 
 TEST_CASE("kruskal's algorithm", "[kruskal]") {
-    const auto& [width, height] { GENERATE(std::make_pair(2, 4), std::make_pair(4, 6), std::make_pair(5, 10),
-                                           std::make_pair(12, 7)) };
+    const auto& [width, height] {
+        GENERATE(std::make_pair(2, 4), std::make_pair(4, 6), std::make_pair(5, 10), std::make_pair(12, 7)),
+    };
     KruskalGenerator generator { width, height, std::mt19937 { std::random_device {}() } };
 
     SECTION("generates begins with a filled maze") { REQUIRE(generator.state().all_set()); }

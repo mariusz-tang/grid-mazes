@@ -97,10 +97,11 @@ TEST_CASE("connected cells", "[connected]") {
                                  "XXXXXXXXXXX",
                                  5, 4)
                           .value() };
-    const auto& [start, finish] { GENERATE(
-        std::make_pair(Cell { 0, 0 }, Cell { 0, 0 }), std::make_pair(Cell { 0, 0 }, Cell { 0, 2 }),
-        std::make_pair(Cell { 0, 0 }, Cell { 1, 1 }), std::make_pair(Cell { 3, 0 }, Cell { 4, 3 }),
-        std::make_pair(Cell { 0, 3 }, Cell { 2, 2 }), std::make_pair(Cell { 2, 2 }, Cell { 2, 2 })) };
+    const auto& [start, finish] {
+        GENERATE(std::make_pair(Cell { 0, 0 }, Cell { 0, 0 }), std::make_pair(Cell { 0, 0 }, Cell { 0, 2 }),
+                 std::make_pair(Cell { 0, 0 }, Cell { 1, 1 }), std::make_pair(Cell { 3, 0 }, Cell { 4, 3 }),
+                 std::make_pair(Cell { 0, 3 }, Cell { 2, 2 }), std::make_pair(Cell { 2, 2 }, Cell { 2, 2 })),
+    };
     REQUIRE(is_connected(maze, start, finish));
 }
 
@@ -117,9 +118,10 @@ TEST_CASE("disconnected cells", "[connected]") {
                                  "XXXXXXXXXXX",
                                  5, 4)
                           .value() };
-    const auto& [start, finish] { GENERATE(
-        std::make_pair(Cell { 0, 0 }, Cell { 4, 3 }), std::make_pair(Cell { 2, 2 }, Cell { 0, 2 }),
-        std::make_pair(Cell { 3, 3 }, Cell { 1, 1 }), std::make_pair(Cell { 3, 0 }, Cell { 0, 1 }),
-        std::make_pair(Cell { 0, 3 }, Cell { 1, 0 }), std::make_pair(Cell { 0, 2 }, Cell { 2, 2 })) };
+    const auto& [start, finish] {
+        GENERATE(std::make_pair(Cell { 0, 0 }, Cell { 4, 3 }), std::make_pair(Cell { 2, 2 }, Cell { 0, 2 }),
+                 std::make_pair(Cell { 3, 3 }, Cell { 1, 1 }), std::make_pair(Cell { 3, 0 }, Cell { 0, 1 }),
+                 std::make_pair(Cell { 0, 3 }, Cell { 1, 0 }), std::make_pair(Cell { 0, 2 }, Cell { 2, 2 })),
+    };
     REQUIRE_FALSE(is_connected(maze, start, finish));
 }

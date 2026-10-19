@@ -172,9 +172,10 @@ TEST_CASE("cell directed neighbours generator", "[maze]") {
                                  "XXXXXXX",
                                  3, 3)
                           .value() };
-    const auto& [cell, count] { GENERATE(std::make_pair(Cell { 0, 0 }, 0), std::make_pair(Cell { 2, 0 }, 1),
-                                         std::make_pair(Cell { 0, 2 }, 2), std::make_pair(Cell { 1, 2 }, 3),
-                                         std::make_pair(Cell { 1, 1 }, 4)) };
+    const auto& [cell, count] {
+        GENERATE(std::make_pair(Cell { 0, 0 }, 0), std::make_pair(Cell { 2, 0 }, 1), std::make_pair(Cell { 0, 2 }, 2),
+                 std::make_pair(Cell { 1, 2 }, 3), std::make_pair(Cell { 1, 1 }, 4)),
+    };
 
     SECTION("returns once for each neighbour") {
         REQUIRE(std::ranges::distance(directed_neighbours(cell, maze)) == count);
@@ -186,13 +187,17 @@ TEST_CASE("cell directed neighbours generator", "[maze]") {
         }
     }
     SECTION("all neighbours unique") {
-        auto cellsOnly { directed_neighbours(cell, maze) |
-                         std::views::transform([](std::pair<Cell, Direction> pair) { return pair.first; }) };
+        auto cellsOnly {
+            directed_neighbours(cell, maze) |
+                std::views::transform([](std::pair<Cell, Direction> pair) { return pair.first; }),
+        };
         REQUIRE(std::unordered_set(std::from_range, cellsOnly).size() == count);
     }
 }
 
-TEST_CASE("cell neighbours generator returns the same as directed neighbours without the directions", "[maze]") {
+TEST_CASE("cell neighbours generator returns the same as directed neighbours "
+          "without the directions",
+          "[maze]") {
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     const Maze maze { parse_text("XXXXXXX\n"
                                  "X X   X\n"

@@ -1,6 +1,6 @@
 BasedOnStyle: LLVM
 Language: Cpp
-Standard: Latest
+Standard: c++23
 IndentWidth: 4
 BreakTemplateDeclarations: Yes
 IncludeBlocks: Regroup
