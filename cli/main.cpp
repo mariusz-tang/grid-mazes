@@ -30,14 +30,11 @@ int main(int argc, char** argv) {
             return;
         }
 
-        bool first { true };
-        for (const auto& maze : steps<KruskalGenerator>(width, height, ::create_rng())) {
-            if (first) {
-                first = false;
-            } else {
-                ::wait_for_enter();
-            }
-            ::print(maze);
+        KruskalGenerator generator { width, height, ::create_rng() };
+        ::print(generator.state());
+        while (!generator.has_terminated()) {
+            ::wait_for_enter();
+            ::print(generator.step());
         }
     });
 
