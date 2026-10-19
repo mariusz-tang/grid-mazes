@@ -16,7 +16,6 @@ target_sources(
     PRIVATE
         test_grid.cpp
         test_maze.cpp
-        generators/test_generator.cpp
         generators/test_kruskal.cpp
         properties/test_connected.cpp
         properties/test_tree.cpp

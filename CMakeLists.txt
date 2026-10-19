@@ -27,7 +27,6 @@ target_sources(
                 include/gridmazes/grid.hpp
                 include/gridmazes/maze.hpp
                 include/gridmazes/generators/common.hpp
-                include/gridmazes/generators/generator.hpp
                 include/gridmazes/generators/kruskal.hpp
                 include/gridmazes/properties/connected.hpp
                 include/gridmazes/properties/tree.hpp

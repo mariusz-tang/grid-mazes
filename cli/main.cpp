@@ -2,7 +2,6 @@
 #include "random.hpp"
 
 #include <CLI/CLI.hpp>
-#include <gridmazes/generators/generator.hpp>
 #include <gridmazes/generators/kruskal.hpp>
 #include <gridmazes/maze.hpp>
 #include <gridmazes/renderers/text.hpp>
@@ -25,12 +24,12 @@ int main(int argc, char** argv) {
     generate_cmd->add_flag("--steps", showSteps, "If specified, show each step of the algorithm");
 
     generate_cmd->callback([&]() {
+        KruskalGenerator generator { width, height, ::create_rng() };
         if (!showSteps) {
-            ::print(generate<KruskalGenerator>(width, height, ::create_rng()));
+            ::print(generator.run());
             return;
         }
 
-        KruskalGenerator generator { width, height, ::create_rng() };
         ::print(generator.state());
         while (!generator.has_terminated()) {
             ::wait_for_enter();

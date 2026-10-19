@@ -1,6 +1,5 @@
 #include "gridmazes/generators/common.hpp"
 
-#include "gridmazes/generators/generator.hpp"
 #include "gridmazes/maze.hpp"
 
 namespace GridMazes {
@@ -21,6 +20,4 @@ const Maze& CommonGenerator::run() {
     }
     return m_maze;
 }
-
-static_assert(Generator<CommonGenerator>);
 } // namespace GridMazes
