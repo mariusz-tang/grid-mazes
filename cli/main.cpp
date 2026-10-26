@@ -2,11 +2,28 @@
 #include "random.hpp"
 
 #include <CLI/CLI.hpp>
+#include <gridmazes/generators/common.hpp>
 #include <gridmazes/generators/kruskal.hpp>
-#include <gridmazes/maze.hpp>
-#include <gridmazes/renderers/text.hpp>
+#include <gridmazes/generators/recursive_division.hpp>
+#include <memory>
+#include <random>
+#include <stdexcept>
+#include <string>
+#include <string_view>
 
-int main(int argc, char** argv) {
+namespace {
+[[nodiscard]] std::unique_ptr<GridMazes::CommonGenerator> get_generator(std::string_view name, int width, int height) {
+    using namespace GridMazes;
+    if (name == "kruskal") {
+        return std::make_unique<KruskalGenerator>(width, height, ::create_rng());
+    } else if (name == "recursive-division") {
+        return std::make_unique<RecursiveDivisionGenerator<std::mt19937>>(width, height, ::create_rng());
+    }
+    throw std::runtime_error { "Invalid generator type." };
+}
+} // namespace
+
+int main(int argc, char* const* argv) {
     using namespace GridMazes;
 
     CLI::App app { "Playground for 2D grid mazes", "gridmazes" };
@@ -23,17 +40,22 @@ int main(int argc, char** argv) {
     bool showSteps { false };
     generate_cmd->add_flag("--steps", showSteps, "If specified, show each step of the algorithm");
 
-    generate_cmd->callback([&]() {
-        KruskalGenerator generator { width, height, ::create_rng() };
+    std::string generator_name { "kruskal" };
+    generate_cmd->add_option("--generator", generator_name, "The type of generator to use")
+        ->check(CLI::IsMember({ "kruskal", "recursive-division" }));
+
+    generate_cmd->callback([&] {
+        std::unique_ptr<CommonGenerator> generator { get_generator(generator_name, width, height) };
+
         if (!showSteps) {
-            ::print(generator.run());
+            ::print(generator->run());
             return;
         }
 
-        ::print(generator.state());
-        while (!generator.has_terminated()) {
+        ::print(generator->state());
+        while (!generator->has_terminated()) {
             ::wait_for_enter();
-            ::print(generator.step());
+            ::print(generator->step());
         }
     });
 
