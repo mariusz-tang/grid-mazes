@@ -28,7 +28,7 @@ TEST_CASE("kruskal's algorithm", "[kruskal]") {
     };
     KruskalGenerator generator { width, height, std::mt19937 { std::random_device {}() } };
 
-    SECTION("generates begins with a filled maze") { REQUIRE(generator.state().all_set()); }
+    SECTION("begins with a filled maze") { REQUIRE(generator.state().all_set()); }
     SECTION("modifies the maze at each step", "[kruskal]") {
         Maze previous { generator.state() };
         while (!generator.has_terminated()) {

@@ -28,7 +28,7 @@ TEST_CASE("recursive division algorithm", "[recursive_division]") {
     };
     RecursiveDivisionGenerator generator { width, height, std::mt19937 { std::random_device {}() } };
 
-    SECTION("generates begins with an empty maze") { REQUIRE(generator.state().all_unset()); }
+    SECTION("begins with an empty maze") { REQUIRE(generator.state().all_unset()); }
     SECTION("modifies the maze at each step", "[recursive_division]") {
         Maze previous { generator.state() };
         while (!generator.has_terminated()) {
