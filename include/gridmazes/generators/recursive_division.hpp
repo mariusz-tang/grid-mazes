@@ -3,6 +3,7 @@
 #include "gridmazes/generators/common.hpp"
 #include "gridmazes/grid.hpp"
 
+#include <random>
 #include <stack>
 
 namespace GridMazes {
@@ -47,7 +48,8 @@ class RecursiveDivisionGenerator : public CommonGenerator {
         int offsetStart { group.x };
         int offsetSize { group.width };
         // If width is larger, split horizontally.
-        if (group.width > group.height || (group.width == group.height && m_rng() % 2 == 0)) {
+        if (group.width > group.height ||
+            (group.width == group.height && std::uniform_int_distribution<>(0, 1)(m_rng))) {
             orientation = Orientation::vertical;
             lineStart = group.x;
             lineSize = group.width - 1;
@@ -57,9 +59,9 @@ class RecursiveDivisionGenerator : public CommonGenerator {
 
         // Pick the size of one of the new groups after division, and the position
         // of the break (to allow passage between the new subgroups).
-        const int newGroupSize { static_cast<int>(m_rng() % lineSize) + 1 };
+        const int newGroupSize { std::uniform_int_distribution<>(1, lineSize)(m_rng) };
         const int line { lineStart + newGroupSize };
-        const int breakOffset { offsetStart + static_cast<int>(m_rng() % offsetSize) };
+        const int breakOffset { offsetStart + std::uniform_int_distribution<>(0, offsetSize - 1)(m_rng) };
 
         // Split the group in two, leaving one wall passable.
         for (int offset { offsetStart }; offset < offsetStart + offsetSize; offset++) {
