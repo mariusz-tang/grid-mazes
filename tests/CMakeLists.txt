@@ -17,6 +17,7 @@ target_sources(
         test_grid.cpp
         test_maze.cpp
         generators/test_kruskal.cpp
+        generators/test_prim.cpp
         generators/test_recursive_division.cpp
         properties/test_connected.cpp
         properties/test_tree.cpp

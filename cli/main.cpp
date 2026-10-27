@@ -4,6 +4,7 @@
 #include <CLI/CLI.hpp>
 #include <gridmazes/generators/common.hpp>
 #include <gridmazes/generators/kruskal.hpp>
+#include <gridmazes/generators/prim.hpp>
 #include <gridmazes/generators/recursive_division.hpp>
 #include <memory>
 #include <random>
@@ -18,6 +19,8 @@ namespace {
         return std::make_unique<KruskalGenerator>(width, height, ::create_rng());
     } else if (name == "recursive-division") {
         return std::make_unique<RecursiveDivisionGenerator<std::mt19937>>(width, height, ::create_rng());
+    } else if (name == "prim") {
+        return std::make_unique<PrimGenerator<std::mt19937>>(width, height, ::create_rng());
     }
     throw std::runtime_error { "Invalid generator type." };
 }
@@ -42,7 +45,7 @@ int main(int argc, char* const* argv) {
 
     std::string generator_name { "kruskal" };
     generate_cmd->add_option("--generator", generator_name, "The type of generator to use")
-        ->check(CLI::IsMember({ "kruskal", "recursive-division" }));
+        ->check(CLI::IsMember({ "kruskal", "recursive-division", "prim" }));
 
     generate_cmd->callback([&] {
         std::unique_ptr<CommonGenerator> generator { ::get_generator(generator_name, width, height) };
