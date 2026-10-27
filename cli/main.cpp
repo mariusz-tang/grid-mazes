@@ -45,7 +45,7 @@ int main(int argc, char* const* argv) {
         ->check(CLI::IsMember({ "kruskal", "recursive-division" }));
 
     generate_cmd->callback([&] {
-        std::unique_ptr<CommonGenerator> generator { get_generator(generator_name, width, height) };
+        std::unique_ptr<CommonGenerator> generator { ::get_generator(generator_name, width, height) };
 
         if (!showSteps) {
             ::print(generator->run());
